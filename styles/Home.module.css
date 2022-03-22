@@ -14,13 +14,13 @@
 }
 
 @media (min-width: 0px) and (orientation: landscape) {
-  .main {    
+  .main {
     min-height: calc(100vh - 48px);
   }
 }
 
 @media (min-width: 600px) {
-  .main {    
+  .main {
     min-height: calc(100vh - 64px);
   }
 }
@@ -119,6 +119,31 @@
 .logo {
   height: 1em;
   margin-left: 0.5rem;
+}
+
+.board {
+  display: block;
+  width: 100%;
+  min-width: 200px;
+  margin: auto;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+}
+
+.tile {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  border: 2px solid #e5e5e5;
+  height: 62px;
+  width: 62px;
+  margin: 5px;
+  text-transform: capitalize;
+  font-size: 35px;
 }
 
 @media (max-width: 600px) {

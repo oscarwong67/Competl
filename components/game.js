@@ -1,6 +1,9 @@
 import TimerIcon from "@mui/icons-material/Timer";
 import { Grid, Typography } from "@mui/material";
+import Box from '@mui/material/Box';
 import { useState } from "react";
+import styles from '../styles/Home.module.css'
+
 
 export default function Game() {
   const [timeInMS, setTimeInMS] = useState(0.0);
@@ -22,14 +25,36 @@ export default function Game() {
 
   return (
     <div className="game-container">
-      <Grid container spacing={2}>
-        <Grid item xs={6}>
+      <Grid container spacing={2} >
+        <Grid item xs={6} sx={{ textAlign: "right"}}>
           <TimerIcon color="inherit" />
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={6} sx={{ paddingLeft: "5px"}}>
           <Typography>{getFormattedTime()}</Typography>
         </Grid>
       </Grid>
+      <div className={styles.board}>
+        <div className={styles.row}>
+        
+          <div className={styles.tile}>
+            
+          </div>
+          <div className={styles.tile}>
+
+          </div>
+          <div className={styles.tile}>
+
+          </div>
+          <div className={styles.tile}>
+
+          </div>
+          <div className={styles.tile}>
+
+          </div>
+          
+        </div>
+        
+      </div>
     </div>
   );
 }
