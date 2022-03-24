@@ -10,7 +10,8 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 import Game from '../components/game';
-import styles from '../styles/Home.module.css'
+import styles from '../styles/Home.module.css';
+import HelpMenu from '../components/helpMenu';
 
 export default function Home() {
   return (
@@ -41,7 +42,8 @@ export default function Home() {
             aria-label="help"
             sx={{ mr: 2 }}
           >
-            <HelpOutlineIcon />
+            {/* <HelpOutlineIcon /> */}
+          <HelpMenu />
           </IconButton>
           <IconButton
             size="large"
