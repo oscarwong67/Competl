@@ -8,6 +8,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { useTheme } from '@mui/material/styles';
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import styles from '../styles/Home.module.css';
+import Image from 'next/image';
 
 export default function ResponsiveDialog() {
   const [open, setOpen] = React.useState(false);
@@ -34,14 +35,22 @@ export default function ResponsiveDialog() {
         </DialogTitle>
         <DialogContent 
           sx={{
-            width: 326
+            width: 326 // Same as mockup width
           }}
         >
-          <DialogContentText>
+          <DialogContentText sx={{ color: '#ffffff' }}>
             Guess today’s secret word in 6 tries. Each guess must be a valid 5 letter word. 
             Hit ENTER to submit. 
+            <br/><br/>
+            Example
           </DialogContentText>
-          <DialogContentText>
+          <Image 
+            src='/../public/helpimg.png' 
+            alt='Competl guess' 
+            width={280} 
+            height={50}
+          />
+          <DialogContentText sx={{ color: '#ffffff' }}>
             I is in the word and in the correct spot.
             R is in the word but in the wrong spot.
             A, T, and E are NOT in the word.
