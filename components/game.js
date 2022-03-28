@@ -114,7 +114,7 @@ export default function Game() {
           <button className={styles.key} data-key="S">
             S
           </button>
-          <button className={styles.key} data-key="D">
+            <button className={`${styles.key} ${styles.correct}`} data-key="D">
             D
           </button>
           <button className={styles.key} data-key="F">
@@ -138,7 +138,7 @@ export default function Game() {
         </div>
 
         <div className={styles.keyboardRow}>
-          <button data-enter className={styles.key}>ENTER</button>
+          <button data-enter className={styles.keyLarge}>ENTER</button>
           <button className={styles.key} data-key="Z">
             Z
           </button>
@@ -160,7 +160,7 @@ export default function Game() {
           <button className={styles.key} data-key="M">
             M
           </button>
-          <button data-enter className={styles.key}><BackspaceIcon /></button>
+          <button data-enter className={styles.keyLarge}><BackspaceIcon /></button>
         </div>
       </div>
     </Container>

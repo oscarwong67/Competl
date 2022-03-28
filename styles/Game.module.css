@@ -57,10 +57,13 @@
   flex-direction: row;
   justify-content: center;
   height: 100%;
+  max-width: 100%;
 }
 
 .key {
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   min-height: 50px;
   min-width: 35px;
   margin: 0.1em;
@@ -68,4 +71,40 @@
   color: white;
   border: none;
   font-weight: bold;
+  border-radius: 3px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.keyLarge {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50px;
+  min-width: 50px;
+  margin: 0.1em;
+  background-color: #818384;
+  color: white;
+  border: none;
+  font-weight: bold;
+  border-radius: 3px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.key:hover,
+.keyLarge:hover {
+  background-color: #9a9a9b;
+}
+
+.key.wrong {
+  background-color: var(--wrong-grey-keyboard);
+}
+
+.key.wrongPostion {
+  background-color: var(--wrong-position-yellow);
+}
+
+.key.correct {
+  background-color: var(--correct-green);
 }
