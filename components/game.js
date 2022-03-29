@@ -1,11 +1,17 @@
 import TimerIcon from '@mui/icons-material/Timer';
 import { Grid, Typography, Container } from '@mui/material';
-import { useState } from 'react';
 import styles from '../styles/Game.module.css';
 import BackspaceIcon from '@mui/icons-material/Backspace';
+import { useState, useEffect } from 'react';
+import { getWordOfDay } from '../lib/words';
 
 export default function Game() {
   const [timeInMS, setTimeInMS] = useState(0.0);
+
+  // Similar to componentDidMount and componentDidUpdate:
+  useEffect(() => {
+    console.log(`Today's word is: ${getWordOfDay().solution.toUpperCase()}`);
+  });
 
   function getFormattedTime() {
     const MS_PER_MINUTE = 60000;
