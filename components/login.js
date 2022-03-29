@@ -46,8 +46,8 @@ export default function CustomizedDialogs() {
   };
 
   if(session) {
-    // if !AccountExists(session.user.email)
-    //  create account creation code
+    // TODO: if user is signed in, but they don't have a username, make them set one now
+    console.log(session.user);
     return <>
       Signed in as {session.user.email} <br/>
       <button onClick={() => signOut()}>Sign out</button>

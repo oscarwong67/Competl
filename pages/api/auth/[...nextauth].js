@@ -1,6 +1,8 @@
 import NextAuth from "next-auth"
 import GithubProvider from "next-auth/providers/github"
 import GoogleProvider from "next-auth/providers/google"
+
+import { addUserToDbIfNotExist } from '../../../lib/users';
 //import TwitterProvider from "next-auth/providers/twitter"
 
 export default NextAuth({
@@ -19,4 +21,24 @@ export default NextAuth({
       clientSecret: process.env.GITHUB_SECRET,
     }),
   ],
+  callbacks: {
+    async jwt({ token, account }) {
+
+      // Persist the OAuth access_token to the token right after signin
+      if (account) {
+        // Deal with user creation only on sign-in
+        const { email } = token;
+        token.accessToken = account.access_token;
+        token.user = await addUserToDbIfNotExist(email);
+        // console.log(token.user);
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      // Send properties to the client, like an access_token from a provider.
+      session.accessToken = token.accessToken;
+      session.user = token.user;
+      return session;
+    }
+  }
 })
