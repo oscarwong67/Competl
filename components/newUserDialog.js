@@ -4,28 +4,22 @@ import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import styles from '../styles/Home.module.css';
 
-export default function EditProfile() {
-  const [open, setOpen] = React.useState(false);
+export default function NewUserDialog({ newAccount }) {
+  const [open, setOpen] = React.useState(newAccount);
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
+  const handleClose = (event, reason) => {
+    if (reason && reason == "backdropClick") return;
     setOpen(false);
   };
 
   return (
     <div>
-      <AccountCircleIcon className={styles.center} onClick={handleClickOpen}/>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Edit Profile</DialogTitle>
-        <DialogContent sx={{ width: 385 }}>
+        <DialogTitle>Set a Username</DialogTitle>
+        <DialogContent sx={{ width: 300}}>
           <TextField
             autoFocus
             margin="dense"
@@ -36,9 +30,9 @@ export default function EditProfile() {
             variant="standard"
           />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleClose}>Save</Button>
+        <DialogActions style={{ 'align-items': 'start', 'justify-content': 'center' }}
+         sx={{ width: 300, height: 90 }}>
+          <Button onClick={handleClose}>Continue</Button>
         </DialogActions>
       </Dialog>
     </div>

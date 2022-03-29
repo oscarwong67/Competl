@@ -3,16 +3,15 @@ import Image from 'next/image'
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import IconButton from "@mui/material/IconButton";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 import Game from '../components/game';
 import styles from '../styles/Home.module.css';
-import HelpMenu from '../components/helpMenu';
-import EditProfile from '../components/editProfile';
+import HelpMenuDialog from '../components/helpMenuDialog';
+import EditProfileDialog from '../components/editProfileDialog';
+import NewUserDialog from '../components/newUserDialog';
 
 export default function Home() {
   return (
@@ -44,7 +43,7 @@ export default function Home() {
             sx={{ mr: 2 }}
           >
             {/* <HelpOutlineIcon /> */}
-            <HelpMenu />
+            <HelpMenuDialog/>
           </IconButton>
           <IconButton
             size="large"
@@ -53,10 +52,11 @@ export default function Home() {
             sx={{ mr: 2 }}
           >
             {/* <AccountCircleIcon /> */}
-            <EditProfile/>
+            <EditProfileDialog/>
           </IconButton>
         </Toolbar>
       </AppBar>
+      <NewUserDialog newAccount={true}/>
       <main className={styles.main}>
         <h1 className={styles.title}>Competl</h1>
         <p className={styles.description}>A competitive word guessing game.</p>

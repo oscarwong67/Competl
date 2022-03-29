@@ -10,7 +10,7 @@ import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import styles from '../styles/Home.module.css';
 import Image from 'next/image';
 
-export default function ResponsiveDialog() {
+export default function HelpMenuDialog() {
   const [open, setOpen] = React.useState(false);
   const theme = useTheme();
 
