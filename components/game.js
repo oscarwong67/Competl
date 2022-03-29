@@ -8,11 +8,68 @@ import { getWordOfDay } from '../lib/words';
 export default function Game() {
   const [timeInMS, setTimeInMS] = useState(0.0);
 
+
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {
     console.log(`Today's word is: ${getWordOfDay().solution.toUpperCase()}`);
-  });
 
+  });
+  
+  const gameBoard = document.querySelector("[game-board]");
+
+    function startInteraction() {
+      window.addEventListener("click", handleMouseClick);
+      window.addEventListener("keydown", handleKeyPress);
+    }
+  
+    function stopInteraction() {
+      window.removeEventListener("click", handleMouseClick);
+      window.removeEventListener("keydown", handleKeyPress);
+    }
+
+    startInteraction(); 
+  
+    function handleMouseClick(e) {
+      if (e.target.matches("[data-key]")) {
+        pressKey(e.target.dataset.key);
+        return;
+      }
+  
+      if(e.target.matches("[data-enter]")) {
+        submitWord();
+        return;
+      }
+  
+      if(e.target.matches("[data-delete]")) {
+        deleteLetter();
+        return;
+      }
+    }
+  
+    function handleKeyPress(e) {
+      if(e.key === "Enter") {
+        submitWord();
+        return;
+      }
+  
+      if(e.key === "Backspace" || e.key === "Delete"){
+        deleteLetter();
+        return;
+      }
+  
+      if(e.key.match(/^[a-z]$/)) {
+        pressKey(e.key);
+        return;
+      }
+    }
+  
+    function pressKey(key) {
+      const nextTile = gameBoard.querySelector(":not([data-letter])");
+      nextTile.dataset.letter = key.toLowerCase();
+      nextTile.textContent = key;
+      nextTile.dataset.state = "active";
+    }
+  
   function getFormattedTime() {
     const MS_PER_MINUTE = 60000;
     const MS_PER_SECOND = 1000;
@@ -38,20 +95,12 @@ export default function Game() {
           <Typography>{getFormattedTime()}</Typography>
         </Grid>
       </Grid>
-      <div className={styles.gameBoard}>
-        <div className={styles.tile} data-state="active">
-          T
-        </div>
-        <div className={styles.tile} data-state="correct">
-          H
-        </div>
-        <div className={styles.tile} data-state="wrong-postion">
-          O
-        </div>
-        <div className={styles.tile} data-state="wrong">
-          S
-        </div>
-        <div className={styles.tile}>E</div>
+      <div game-board className={styles.gameBoard}>
+        <div className={styles.tile}></div>
+        <div className={styles.tile}></div>
+        <div className={styles.tile}></div>
+        <div className={styles.tile}></div>
+        <div className={styles.tile}></div>
         <div className={styles.tile}></div>
         <div className={styles.tile}></div>
         <div className={styles.tile}></div>
@@ -142,7 +191,7 @@ export default function Game() {
             L
           </button>
         </div>
-
+        <div className={styles.space}></div>
         <div className={styles.keyboardRow}>
           <button data-enter className={styles.keyLarge}>ENTER</button>
           <button className={styles.key} data-key="Z">
