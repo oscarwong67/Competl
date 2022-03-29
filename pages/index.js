@@ -10,11 +10,18 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 import Game from '../components/game';
+import Login from '../components/login';
+import SetUsername from '../components/setUsername';
 import styles from '../styles/Home.module.css';
 import HelpMenu from '../components/helpMenu';
 import EditProfile from '../components/editProfile';
 
+import { signIn, signOut, useSession } from "next-auth/react"
+
+
 export default function Home() {
+  const { data: session, status } = useSession()
+
   return (
     <div className={styles.container}>
       <Head>
@@ -61,8 +68,8 @@ export default function Home() {
         <h1 className={styles.title}>Competl</h1>
         <p className={styles.description}>A competitive word guessing game.</p>
         <Game />
+        <Login disableBackdropClick />
       </main>
-
       <footer className={styles.footer}>
         <a
           href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
@@ -78,3 +85,8 @@ export default function Home() {
     </div>
   );
 }
+
+// AUTHENTICATION TODO:
+// Add users to database after login
+// Add select username screen
+// Clean up login screen ui
