@@ -2,7 +2,7 @@
   max-width: 100%;
 }
 
-.gameBoard {
+.gameboard {
   display: grid;
   justify-content: center;
   align-content: center;
@@ -35,7 +35,7 @@
   background-color: var(--correct-green);
 }
 
-.tile[data-state='wrong-postion'] {
+.tile[data-state='wrong-position'] {
   border: none;
   background-color: var(--wrong-position-yellow);
 }
