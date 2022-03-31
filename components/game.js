@@ -1,5 +1,5 @@
 import TimerIcon from '@mui/icons-material/Timer';
-import { Grid, Typography, Container } from '@mui/material';
+import { Grid, Typography, Container, Snackbar } from '@mui/material';
 import styles from '../styles/Game.module.css';
 import BackspaceIcon from '@mui/icons-material/Backspace';
 import { useState, useEffect } from 'react';
@@ -19,7 +19,6 @@ export default function Game() {
   
   function startInteraction() {
     window.addEventListener("click", handleMouseClick);
-    window.addEventListener("keydown", handleKeyPress);
   }
 
   function stopInteraction() {
@@ -84,7 +83,7 @@ export default function Game() {
     const activeTiles = [...getActiveTiles()];
     if (activeTiles.length !== WORD_LENGTH){
       // TODO make a pop up of this message and animation if you want i guess
-      console.log("Not long enough!");
+      showAlert("Not long enough!");
       return;
     }
 
@@ -94,7 +93,7 @@ export default function Game() {
 
     if(!isGuessValid(guess)){
       // TODO make a pop up of this message and animation if you want i guess
-      console.log("Not in word list!");
+      showAlert("Not in word list!");
       return;
     }
 
@@ -138,6 +137,13 @@ export default function Game() {
     const gameboard = window.document.querySelector(`.${styles.gameboard}`);
     return gameboard.querySelectorAll('[data-state="active"]');
   }
+
+  function showAlert(message, duration=1000) {
+    const alertContainer = window.document.querySelector("[data-alert-container]");
+    const snackbar = <Snackbar anchorOrigin={{ vertical: "top", horizontal: "center" }} autoHideDuration={duration} message={message}/>;
+    const alert = document.createElement(snackbar);
+    alertContainer.prepend(alert);
+  }
     
   function getFormattedTime() {
     const MS_PER_MINUTE = 60000;
@@ -164,6 +170,13 @@ export default function Game() {
           <Typography>{getFormattedTime()}</Typography>
         </Grid>
       </Grid>
+      <div data-alert-container>
+        <Snackbar
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          autoHideDuration={6000}
+          message="Note archived"
+        />
+      </div>
       <div className={styles.gameboard}>
         <div className={styles.tile}></div>
         <div className={styles.tile}></div>
