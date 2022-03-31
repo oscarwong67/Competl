@@ -140,8 +140,11 @@ export default function Game() {
 
   function showAlert(message, duration=1000) {
     const alertContainer = window.document.querySelector("[data-alert-container]");
-    const snackbar = <Snackbar anchorOrigin={{ vertical: "top", horizontal: "center" }} autoHideDuration={duration} message={message}/>;
-    const alert = document.createElement(snackbar);
+    const snackbar = <Snackbar anchorOrigin={{ vertical: "top", horizontal: "center" }} autoHideDuration={duration} message="Note archived"/>
+    const alert = document.createElement(snackbar, "Snackbar");
+    alert.message = message;
+    alert.autoHideDuration = duration;
+    alert.anchorOrigin = { vertical: "top", horizontal: "center" };
     alertContainer.prepend(alert);
   }
     
