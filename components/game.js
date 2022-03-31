@@ -14,7 +14,8 @@ export default function Game() {
   useEffect(() => {
     console.log(`Today's word is: ${getWordOfDay().solution.toUpperCase()}`);  
     window.addEventListener("keydown", handleKeyPress);
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   
   function startInteraction() {
     window.addEventListener("click", handleMouseClick);
