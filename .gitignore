@@ -19,6 +19,8 @@
 .DS_Store
 *.pem
 /.vscode
+.env.production
+.env.development
 
 # debug
 npm-debug.log*
