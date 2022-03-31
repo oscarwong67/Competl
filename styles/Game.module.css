@@ -1,0 +1,110 @@
+.gameContainer {
+  max-width: 100%;
+}
+
+.gameboard {
+  display: grid;
+  justify-content: center;
+  align-content: center;
+  flex-grow: 1;
+  grid-template-columns: repeat(5, 4em);
+  grid-template-rows: repeat(6, 4em);
+  gap: 0.25em;
+  margin-top: 2em;
+  margin-bottom: 1em;
+}
+
+.tile {
+  color: white;
+  border: 0.07em solid #e5e5e549;
+  text-transform: capitalize;
+  font-size: 2em;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
+}
+
+.tile[data-state='active'] {
+  border-color: var(--active-border-grey);
+}
+
+.tile[data-state='correct'] {
+  border: none;
+  background-color: var(--correct-green);
+}
+
+.tile[data-state='wrong-position'] {
+  border: none;
+  background-color: var(--wrong-position-yellow);
+}
+
+.tile[data-state='wrong'] {
+  border: none;
+  background-color: var(--wrong-grey);
+}
+
+.keyboard {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 150px;
+}
+
+.keyboardRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  height: 100%;
+  max-width: 100%;
+}
+
+.key {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50px;
+  min-width: 35px;
+  margin: 0.1em;
+  background-color: #818384;
+  color: white;
+  border: none;
+  font-weight: bold;
+  border-radius: 3px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.keyLarge {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50px;
+  min-width: 50px;
+  margin: 0.1em;
+  background-color: #818384;
+  color: white;
+  border: none;
+  font-weight: bold;
+  border-radius: 3px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.key:hover,
+.keyLarge:hover {
+  background-color: #9a9a9b;
+}
+
+.key.wrong {
+  background-color: var(--wrong-grey-keyboard);
+}
+
+.key.wrongPostion {
+  background-color: var(--wrong-position-yellow);
+}
+
+.key.correct {
+  background-color: var(--correct-green);
+}
