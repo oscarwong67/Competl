@@ -10,7 +10,6 @@ const WORD_LENGTH = 5;
 export default function Game() {
   const [timeInMS, setTimeInMS] = useState(0.0);
 
-
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {
     console.log(`Today's word is: ${getWordOfDay().solution.toUpperCase()}`);  
