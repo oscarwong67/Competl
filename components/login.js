@@ -1,6 +1,9 @@
+import styles from '../styles/Login.module.css';
+
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
 import { styled } from '@mui/material/styles';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -9,8 +12,12 @@ import DialogActions from '@mui/material/DialogActions';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
+import GoogleIcon from '@mui/icons-material/Google';
+import GitHubIcon from '@mui/icons-material/GitHub';
 
 import { signIn, signOut, getProviders, useSession } from "next-auth/react"
+import GithubProvider from "next-auth/providers/github"
+import GoogleProvider from "next-auth/providers/google"
 
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
@@ -41,32 +48,42 @@ export default function CustomizedDialogs() {
   const { data: session, status } = useSession()
   const [open, setOpen] = React.useState(true);
 
+  // Hardcoded, manually update if adding more providers
+  const providers = [GoogleProvider({clientId: process.env.GOOGLE_ID,clientSecret: process.env.GOOGLE_SECRET,}), GithubProvider({clientId: process.env.GITHUB_ID,clientSecret: process.env.GITHUB_SECRET,})];
+
   const handleClose = () => {
     setOpen(false);
   };
 
   if(session) {
-    // TODO: if user is signed in, but they don't have a username, make them set one now
     console.log(session.user);
-    return <>
-      Signed in as {session.user.email} <br/>
-      <button onClick={() => signOut()}>Sign out</button>
-    </>
+    return <></>
   }
   return <>
-    Not signed in <br/>
-
     <div>
       <BootstrapDialog
-        //onClose={handleClose}
+        BackdropProps={{ style: { backgroundColor: "transparent" } }}
         aria-labelledby="customized-dialog-title"
         open={open}
       >
         <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-          Sign In
+          Please Sign To Start Competing
         </BootstrapDialogTitle>
         <DialogContent dividers>
-        <button onClick={() => signIn()}>Sign in</button>
+        <Grid container justify="center" direction="column" >
+            <div className={styles.loginbtn}>
+              <Button variant="outlined" sx={{color: "white", backgroundColor: "secondary"}} onClick={() => signIn(providers[0].id)}>  
+                <GoogleIcon fontSize="large" className={styles.loginicon} />
+                <span class="login-btn-text">Continue with {providers[0].name}</span>
+              </Button>
+            </div>
+            <div className={styles.loginbtn}>
+              <Button variant="outlined" sx={{color: "white", backgroundColor: "secondary"}} onClick={() => signIn(providers[1].id)}>  
+                <GitHubIcon fontSize="large" className={styles.loginicon} />
+                <span class="login-btn-text">Continue with {providers[1].name}</span>
+              </Button>
+            </div>
+          </Grid>
         </DialogContent>
       </BootstrapDialog>
     </div>

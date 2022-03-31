@@ -1,0 +1,11 @@
+.loginbtn {
+    padding: 0.4rem;
+    margin: auto;
+  }
+  
+  .loginicon {
+    display: block;
+    height: 32px;
+    padding-right: 12px;
+    color: white;
+  }

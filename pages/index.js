@@ -67,7 +67,7 @@ export default function Home() {
       <main className={styles.main}>
         {/* <p className={styles.description}>A competitive word guessing game.</p> */}
         <Game />
-        {/* <Login disableBackdropClick /> */}
+        <Login disableBackdropClick />
       </main>
       <footer className={styles.footer}>
         <a
