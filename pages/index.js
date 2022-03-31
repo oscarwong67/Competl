@@ -22,6 +22,7 @@ import { signIn, signOut, useSession } from "next-auth/react"
 
 export default function Home() {
   const { data: session, status } = useSession()
+  console.log(session);
 
   return (
     <div className={styles.container}>
@@ -64,11 +65,12 @@ export default function Home() {
           </IconButton>
         </Toolbar>
       </AppBar>
-      <NewUserDialog newAccount={true}/>
+      <NewUserDialog newAccount={session && session.user && !session.user.username} 
+        userId={session && session.user ? session.user._id : ''}/>
       <main className={styles.main}>
         {/* <p className={styles.description}>A competitive word guessing game.</p> */}
         <Game />
-        {/* <Login disableBackdropClick /> */}
+        <Login disableBackdropClick />
       </main>
       <footer className={styles.footer}>
         <a

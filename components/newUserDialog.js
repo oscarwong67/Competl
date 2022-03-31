@@ -5,14 +5,35 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import styles from '../styles/Home.module.css';
+// import { updateUserName } from '../lib/users';
 
-export default function NewUserDialog({ newAccount }) {
+export default function NewUserDialog({ newAccount, userId }) {
   const [open, setOpen] = React.useState(newAccount);
+  const [usernameValue, setUsernameValue] = React.useState("");
+  console.log('new user id', userId);
+
+  React.useEffect(() => {
+    setOpen(newAccount);
+  }, [newAccount]);
 
   const handleClose = (event, reason) => {
     if (reason && reason == "backdropClick") return;
-    setOpen(false);
+    if (checkValidUsername(usernameValue)) {
+      console.log('set username to', usernameValue)
+      // Call username backend function
+      // updateUserName(userId, usernameValue);
+      setOpen(false);
+    }
+  };
+
+  const handleTextInput = (e) => {
+    setUsernameValue(e.target.value);
+  }
+
+  const checkValidUsername = (username) => {
+    // TODO: profanity filter
+    if (username.length <= 0) return false;
+    return true;
   };
 
   return (
@@ -28,6 +49,8 @@ export default function NewUserDialog({ newAccount }) {
             type="email"
             fullWidth
             variant="standard"
+            inputProps={{ maxLength: 10 }}
+            onChange={handleTextInput}
           />
         </DialogContent>
         <DialogActions style={{ 'align-items': 'start', 'justify-content': 'center' }}
