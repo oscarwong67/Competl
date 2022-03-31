@@ -12,15 +12,21 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Game from '../components/game';
 import Login from '../components/login';
 import SetUsername from '../components/setUsername';
+import Leaderboard from "../components/leaderboard";
 import styles from '../styles/Home.module.css';
 import HelpMenu from '../components/helpMenu';
 import EditProfile from '../components/editProfile';
-
+import { useState } from 'react';
 import { signIn, signOut, useSession } from "next-auth/react"
 
 
 export default function Home() {
-  const { data: session, status } = useSession()
+  const { data: session, status } = useSession();
+  const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+
+  const toggleDrawer = () => {
+    setIsLeaderboardOpen(!isLeaderboardOpen);
+  }
 
   return (
     <div className={styles.container}>
@@ -39,10 +45,15 @@ export default function Home() {
               color="inherit"
               aria-label="menu"
               sx={{ mr: 2 }}
+              onClick={toggleDrawer}
             >
               <WorkspacePremiumIcon />
               <ArrowForwardIosIcon />
             </IconButton>
+            <Leaderboard
+              isOpen={isLeaderboardOpen}
+              toggleDrawer={toggleDrawer}
+            />
           </Box>
           <IconButton
             size="large"
@@ -60,7 +71,7 @@ export default function Home() {
             sx={{ mr: 2 }}
           >
             {/* <AccountCircleIcon /> */}
-            <EditProfile/>
+            <EditProfile />
           </IconButton>
         </Toolbar>
       </AppBar>
