@@ -55,7 +55,8 @@ export default function CustomizedDialogs() {
     setOpen(false);
   };
 
-  if(session) {
+  if (session) {
+    // TODO: if user is signed in, but they don't have a username, make them set one now
     console.log(session.user);
     return <></>
   }
@@ -74,13 +75,13 @@ export default function CustomizedDialogs() {
             <div className={styles.loginbtn}>
               <Button variant="outlined" sx={{color: "white", backgroundColor: "secondary"}} onClick={() => signIn(providers[0].id)}>  
                 <GoogleIcon fontSize="large" className={styles.loginicon} />
-                <span class="login-btn-text">Continue with {providers[0].name}</span>
+                <span className="login-btn-text">Continue with {providers[0].name}</span>
               </Button>
             </div>
             <div className={styles.loginbtn}>
               <Button variant="outlined" sx={{color: "white", backgroundColor: "secondary"}} onClick={() => signIn(providers[1].id)}>  
                 <GitHubIcon fontSize="large" className={styles.loginicon} />
-                <span class="login-btn-text">Continue with {providers[1].name}</span>
+                <span className="login-btn-text">Continue with {providers[1].name}</span>
               </Button>
             </div>
           </Grid>

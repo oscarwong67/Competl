@@ -27,11 +27,11 @@ export default NextAuth({
       // Persist the OAuth access_token to the token right after signin
       if (account) {
         // Deal with user creation only on sign-in
-        const { email } = token;
         token.accessToken = account.access_token;
-        token.user = await addUserToDbIfNotExist(email);
-        // console.log(token.user);
       }
+      const { email } = token;
+      token.user = await addUserToDbIfNotExist(email);
+      // console.log(token.user);
       return token;
     },
     async session({ session, token }) {
