@@ -5,23 +5,34 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-// import { updateUserName } from '../lib/users';
 
 export default function NewUserDialog({ newAccount, userId }) {
   const [open, setOpen] = React.useState(newAccount);
   const [usernameValue, setUsernameValue] = React.useState("");
-  console.log('new user id', userId);
 
   React.useEffect(() => {
     setOpen(newAccount);
   }, [newAccount]);
+
+  const updateUserName = async (userId, usernameValue) => {
+    await fetch('/api/user/updateUsername', {
+      method: 'POST',
+      body: JSON.stringify({
+        userId: userId,
+        username: usernameValue,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  };
 
   const handleClose = (event, reason) => {
     if (reason && reason == "backdropClick") return;
     if (checkValidUsername(usernameValue)) {
       console.log('set username to', usernameValue)
       // Call username backend function
-      // updateUserName(userId, usernameValue);
+      updateUserName(userId, usernameValue);
       setOpen(false);
     }
   };
