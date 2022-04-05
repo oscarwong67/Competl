@@ -17,10 +17,21 @@ import EditProfileDialog from '../components/editProfileDialog';
 import NewUserDialog from '../components/newUserDialog';
 
 import { signIn, signOut, useSession } from "next-auth/react"
+import { useEffect, useState } from 'react';
 
 
 export default function Home() {
   const { data: session, status } = useSession()
+  const [openProfileMenu, setOpenProfileMenu] = useState(false);
+  const [openNewUserPopup, setOpenNewUserPopup] = useState(false);
+
+  useEffect(() => {
+    if (session && session.user && !session.user.username) {
+      setOpenNewUserPopup(true);
+    } else {
+      setOpenNewUserPopup(false);
+    }
+  }, [session])
 
   return (
     <div className={styles.container}>
@@ -59,15 +70,18 @@ export default function Home() {
             sx={{ mr: 2 }}
           >
             {/* <AccountCircleIcon /> */}
-            <EditProfileDialog/>
+            <EditProfileDialog openCallback={setOpenProfileMenu}
+              isOpen={openProfileMenu}
+              userId={session && session.user ? session.user._id : '' } 
+              currUsername={session && session.user ? session.user.username : ''}/>
           </IconButton>
         </Toolbar>
       </AppBar>
-      <NewUserDialog newAccount={session && session.user && !session.user.username} 
+      <NewUserDialog newAccount={openNewUserPopup} 
         userId={session && session.user ? session.user._id : ''}/>
       <main className={styles.main}>
         {/* <p className={styles.description}>A competitive word guessing game.</p> */}
-        <Game />
+        <Game popupOpen={openProfileMenu || openNewUserPopup}/> {/* TODO: Add help menu too */}
         <Login disableBackdropClick />
       </main>
       <footer className={styles.footer}>

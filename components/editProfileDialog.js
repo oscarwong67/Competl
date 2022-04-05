@@ -9,23 +9,54 @@ import DialogTitle from '@mui/material/DialogTitle';
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import styles from '../styles/Home.module.css';
 
-export default function EditProfileDialog() {
-  const [open, setOpen] = React.useState(false);
+export default function EditProfileDialog({ userId, currUsername, openCallback, isOpen }) {
+  const [usernameValue, setUsernameValue] = React.useState(currUsername);
 
   const handleClickOpen = () => {
-    setOpen(true);
+    openCallback(true);
   };
 
   const handleClose = () => {
-    setOpen(false);
+    openCallback(false);
+  };
+
+  const updateUserName = async (userId, usernameValue) => {
+    await fetch('/api/user/updateUsername', {
+      method: 'POST',
+      body: JSON.stringify({
+        userId: userId,
+        username: usernameValue,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  };
+
+  const handleSave = () => {
+    if (checkValidUsername(usernameValue)) {
+      // Call username backend function
+      updateUserName(userId, usernameValue);
+      handleClose(false);
+    }
+  }
+
+  const handleTextInput = (e) => {
+    setUsernameValue(e.target.value);
+  }
+
+  const checkValidUsername = (username) => {
+    // TODO: profanity filter
+    if (username.length <= 0) return false;
+    return true;
   };
 
   return (
     <div>
       <AccountCircleIcon className={styles.center} onClick={handleClickOpen}/>
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog open={isOpen} onClose={handleClose}>
         <DialogTitle>Edit Profile</DialogTitle>
-        <DialogContent sx={{ width: 385 }}>
+        <DialogContent>
           <TextField
             autoFocus
             margin="dense"
@@ -34,11 +65,13 @@ export default function EditProfileDialog() {
             type="email"
             fullWidth
             variant="standard"
+            defaultValue={currUsername}
+            onChange={handleTextInput}
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleClose}>Save</Button>
+          <Button onClick={handleSave}>Save</Button>
         </DialogActions>
       </Dialog>
     </div>

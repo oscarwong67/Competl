@@ -7,8 +7,16 @@ import { getWordOfDay, isGuessValid, checkLetter, checkWin } from '../lib/words'
 
 const WORD_LENGTH = 5;
 
-export default function Game() {
+export default function Game({ popupOpen }) {
   const [timeInMS, setTimeInMS] = useState(0.0);
+
+  useEffect(() => {
+    if (popupOpen) {
+      stopInteraction();
+    } else {
+      startInteraction();
+    }
+  }, [popupOpen])
 
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {
@@ -18,11 +26,13 @@ export default function Game() {
   }, []);
   
   function startInteraction() {
+    console.log('starting interaction');
     window.addEventListener("click", handleMouseClick);
     window.addEventListener("keydown", handleKeyPress);
   }
 
   function stopInteraction() {
+    console.log('stopping interaction');
     window.removeEventListener("click", handleMouseClick);
     window.removeEventListener("keydown", handleKeyPress);
   }
