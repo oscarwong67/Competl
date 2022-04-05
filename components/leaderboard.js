@@ -128,7 +128,7 @@ export default function Leaderboard(props) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {/* TODO: put some scores in the DB and see how it goes + work on scrolling etc; might need to use datagrid instead so i can scroll */}
+              {/* TODO: scrolling - might need to use datagrid instead, but maybe we can do it manually too */}
               {/* Also look at https://mui.com/components/tables/#sticky-header */}
               {scores.map((score, idx) => (
                 <TableRow
