@@ -11,7 +11,6 @@ import Typography from '@mui/material/Typography';
 
 import Game from '../components/game';
 import Login from '../components/login';
-import SetUsername from '../components/setUsername';
 import styles from '../styles/Home.module.css';
 import HelpMenuDialog from '../components/helpMenuDialog';
 import EditProfileDialog from '../components/editProfileDialog';

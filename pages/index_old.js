@@ -11,7 +11,6 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 import Game from '../components/game';
 import Login from '../components/login';
-import SetUsername from '../components/setUsername';
 import styles from '../styles/Home.module.css';
 import HelpMenu from '../components/helpMenu';
 import EditProfile from '../components/editProfile';
