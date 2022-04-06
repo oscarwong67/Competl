@@ -1,0 +1,13 @@
+.bar {
+  height: 5px;
+  background-color: white;
+  align-self: center;
+}
+
+.accentedBg {
+  background-color: var(--accent-purple);
+}
+
+.accentedText {
+  color: var(--accent-purple);
+}

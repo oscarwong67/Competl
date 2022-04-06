@@ -19,6 +19,8 @@
 .DS_Store
 *.pem
 /.vscode
+.env.production
+.env.development
 
 # debug
 npm-debug.log*
@@ -36,3 +38,5 @@ yarn-error.log*
 .vercel
 env.development
 env.production
+.env.development
+.env.production

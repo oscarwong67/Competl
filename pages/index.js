@@ -13,15 +13,21 @@ import Typography from '@mui/material/Typography';
 import Game from '../components/game';
 import Login from '../components/login';
 import SetUsername from '../components/setUsername';
+import Leaderboard from "../components/leaderboard";
 import styles from '../styles/Home.module.css';
 import HelpMenu from '../components/helpMenu';
 import EditProfile from '../components/editProfile';
-
+import { useState } from 'react';
 import { signIn, signOut, useSession } from "next-auth/react"
 
 
 export default function Home() {
-  const { data: session, status } = useSession()
+  const { data: session, status } = useSession();
+  const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+
+  const toggleDrawer = () => {
+    setIsLeaderboardOpen(!isLeaderboardOpen);
+  }
 
   return (
     <div className={styles.container}>
@@ -30,20 +36,27 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <AppBar position="static">
+      {session && (<AppBar position="static">
         <Toolbar>
-          {/* Left Side */}
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2 }}
-          >
-            <WorkspacePremiumIcon />
-            <ArrowForwardIosIcon />
-          </IconButton>
-          <Typography variant="h6" nowrap component="div" sx={{ flexGrow: 1, display: { xs: 'block' } }}>Competl</Typography>
+          <Box display="flex" flexGrow={1}>
+            {/* Left Side */}
+            <IconButton
+              size="large"
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              sx={{ mr: 2 }}
+              onClick={toggleDrawer}
+            >
+              <WorkspacePremiumIcon />
+              <ArrowForwardIosIcon />
+            </IconButton>
+            <Leaderboard
+              isOpen={isLeaderboardOpen}
+              toggleDrawer={toggleDrawer}
+            />
+            <Typography variant="h6" nowrap="true" component="div" sx={{ flexGrow: 1, display: { xs: 'block', alignSelf: 'center' } }}>Competl</Typography>
+          </Box>
           <IconButton
             size="large"
             color="inherit"
@@ -60,14 +73,14 @@ export default function Home() {
             sx={{ mr: 2 }}
           >
             {/* <AccountCircleIcon /> */}
-            <EditProfile/>
+            <EditProfile />
           </IconButton>
         </Toolbar>
-      </AppBar>
+      </AppBar>)}
       <main className={styles.main}>
         {/* <p className={styles.description}>A competitive word guessing game.</p> */}
         <Game />
-        {/* <Login disableBackdropClick /> */}
+        <Login disableBackdropClick />
       </main>
       <footer className={styles.footer}>
         <a
