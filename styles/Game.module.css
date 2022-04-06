@@ -111,7 +111,7 @@
 
 .startButtonContainer {
   position: fixed;
-  top: 35vh;
+  top: 40vh;
   left: 50vw;
   transform: translateX(-55%);
   z-index: 1;
