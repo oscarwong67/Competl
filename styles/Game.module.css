@@ -108,3 +108,60 @@
 .key.correct {
   background-color: var(--correct-green);
 }
+
+.startButtonContainer {
+  position: fixed;
+  top: 35vh;
+  left: 50vw;
+  transform: translateX(-55%);
+  z-index: 1;
+}
+
+.startButton {
+  background-color: var(--correct-green);
+  border: none;
+  font-size: 3em;
+  color: snow;
+  padding: 15px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.startButton:hover {
+  background-color: #538d4e;
+}
+
+.startButtonContainer.hide {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.alertContainer {
+  position: fixed;
+  top: 10vh;
+  left: 50vw;
+  transform: translateX(-50%);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.alert {
+  pointer-events: none;
+  background-color: rgb(240, 240, 240);
+  padding: 0.75em;
+  border-radius: 5px;
+  color: black;
+  opacity: 1;
+  transition: opacity 500ms ease-in-out;
+  margin-bottom: 0.5em;
+}
+
+.alert:last-child {
+  margin-bottom: 0;
+}
+
+.alert.hide {
+  opacity: 0;
+}
