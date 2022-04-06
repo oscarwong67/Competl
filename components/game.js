@@ -11,6 +11,7 @@ const WORD_LENGTH = 5;
 export default function Game() {
   const [timeInMs, setTimeInMs] = useState(0.0);
   let guessed = false;
+  let guessLine = 0;
 
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {
@@ -103,7 +104,7 @@ export default function Game() {
       showAlert("Not in word list!");
       return;
     }
-
+    guessLine += 1;
     activeTiles.forEach((...params) => setTiles(...params, guess))
   }
 
@@ -133,6 +134,7 @@ export default function Game() {
       if(checkWin(guess, wordOfDay)){
         showAlert("Congratulations! You guessed the word");
         guessed = true;
+        console.log(guessLine);
         stopInteraction();
       }
     }
