@@ -15,7 +15,7 @@ import styles from '../styles/Home.module.css';
 import HelpMenuDialog from '../components/helpMenuDialog';
 import EditProfileDialog from '../components/editProfileDialog';
 import NewUserDialog from '../components/newUserDialog';
-
+import Leaderboard from "../components/leaderboard";
 import { signIn, signOut, useSession } from "next-auth/react"
 import { useEffect, useState } from 'react';
 
@@ -24,6 +24,7 @@ export default function Home() {
   const { data: session, status } = useSession()
   const [openProfileMenu, setOpenProfileMenu] = useState(false);
   const [openNewUserPopup, setOpenNewUserPopup] = useState(false);
+  const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
 
   useEffect(() => {
     if (session && session.user && !session.user.username) {
@@ -33,6 +34,10 @@ export default function Home() {
     }
   }, [session])
 
+  const toggleDrawer = () => {
+    setIsLeaderboardOpen(!isLeaderboardOpen);
+  }
+
   return (
     <div className={styles.container}>
       <Head>
@@ -40,48 +45,68 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <AppBar position="static">
-        <Toolbar>
-          {/* Left Side */}
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2 }}
-          >
-            <WorkspacePremiumIcon />
-            <ArrowForwardIosIcon />
-          </IconButton>
-          <Typography variant="h6" nowrap component="div" sx={{ flexGrow: 1, display: { xs: 'block' } }}>Competl</Typography>
-          <IconButton
-            size="large"
-            color="inherit"
-            aria-label="help"
-            sx={{ mr: 2 }}
-          >
-            {/* <HelpOutlineIcon /> */}
-            <HelpMenuDialog/>
-          </IconButton>
-          <IconButton
-            size="large"
-            color="inherit"
-            aria-label="profile"
-            sx={{ mr: 2 }}
-          >
-            {/* <AccountCircleIcon /> */}
-            <EditProfileDialog openCallback={setOpenProfileMenu}
-              isOpen={openProfileMenu}
-              userId={session && session.user ? session.user._id : '' } 
-              currUsername={session && session.user ? session.user.username : ''}/>
-          </IconButton>
-        </Toolbar>
-      </AppBar>
+      {session && (
+        <AppBar position="static">
+          <Toolbar>
+            <Box display="flex" flexGrow={1}>
+              {/* Left Side */}
+              <IconButton
+                size="large"
+                edge="start"
+                color="inherit"
+                aria-label="menu"
+                sx={{ mr: 2 }}
+                onClick={toggleDrawer}
+              >
+                <WorkspacePremiumIcon />
+                <ArrowForwardIosIcon />
+              </IconButton>
+              <Leaderboard
+                isOpen={isLeaderboardOpen}
+                toggleDrawer={toggleDrawer}
+              />
+              <Typography
+                variant="h6"
+                nowrap="true"
+                component="div"
+                sx={{
+                  flexGrow: 1,
+                  display: { xs: "block", alignSelf: "center" },
+                }}
+              >
+                Competl
+              </Typography>
+            </Box>
+            <IconButton
+              size="large"
+              color="inherit"
+              aria-label="help"
+              sx={{ mr: 2 }}
+            >
+              {/* <HelpOutlineIcon /> */}
+              <HelpMenuDialog />
+            </IconButton>
+            <IconButton
+              size="large"
+              color="inherit"
+              aria-label="profile"
+              sx={{ mr: 2 }}
+            >
+              {/* <AccountCircleIcon /> */}
+              <EditProfileDialog openCallback={setOpenProfileMenu}
+                isOpen={openProfileMenu}
+                userId={session && session.user ? session.user._id : '' } 
+                currUsername={session && session.user ? session.user.username : ''}/>
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+      )}
       <NewUserDialog newAccount={openNewUserPopup} 
         userId={session && session.user ? session.user._id : ''}/>
       <main className={styles.main}>
+        <p className={styles.description}>Competl</p>
         {/* <p className={styles.description}>A competitive word guessing game.</p> */}
-        <Game/> {/* TODO: Add help menu too */}
+        <Game />
         <Login disableBackdropClick />
       </main>
       <footer className={styles.footer}>

@@ -1,35 +1,39 @@
 import TimerIcon from '@mui/icons-material/Timer';
-import { Grid, Typography, Container } from '@mui/material';
+import { Grid, Typography, Container, Snackbar } from '@mui/material';
 import styles from '../styles/Game.module.css';
 import BackspaceIcon from '@mui/icons-material/Backspace';
 import { useState, useEffect } from 'react';
 import { getWordOfDay, isGuessValid, checkLetter, checkWin } from '../lib/words';
+import { getFormattedTime } from '../lib/utils';
 
 const WORD_LENGTH = 5;
 
 export default function Game() {
-  const [timeInMS, setTimeInMS] = useState(0.0);
+  const [timeInMs, setTimeInMs] = useState(0.0);
+  let guessed = false;
 
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {
     console.log(`Today's word is: ${getWordOfDay().solution.toUpperCase()}`);  
-    window.addEventListener("keydown", handleKeyPress);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  
-  function startInteraction() {
-    console.log('starting interaction');
-    window.addEventListener("click", handleMouseClick);
-    window.addEventListener("keydown", handleKeyPress);
+  });
+
+  function startGame () {
+    const button = window.document.querySelector("[data-start-button]");
+    button.classList.add(`${styles.hide}`);
+
+    window.document.addEventListener("click", handleMouseClick);
+    window.document.addEventListener("keydown", handleKeyPress);
   }
 
   function stopInteraction() {
-    console.log('stopping interaction');
-    window.removeEventListener("click", handleMouseClick);
-    window.removeEventListener("keydown", handleKeyPress);
+    console.log("wht")
+    window.document.removeEventListener("click", handleMouseClick);
+    window.document.removeEventListener("keydown", handleKeyPress);
   }
 
-  function handleMouseClick(e) {
+  const handleMouseClick = (e) => {
+    if(guessed) return;
+
     if (e.target.matches("[data-key]")) {
       pressKey(e.target.dataset.key);
       return;
@@ -46,7 +50,9 @@ export default function Game() {
     }
   }
 
-  function handleKeyPress(e) {
+  const handleKeyPress = (e) => {
+    if(guessed) return;
+
     if(e.key === "Enter") {
       submitWord();
       return;
@@ -85,8 +91,7 @@ export default function Game() {
   function submitWord() {
     const activeTiles = [...getActiveTiles()];
     if (activeTiles.length !== WORD_LENGTH){
-      // TODO make a pop up of this message and animation if you want i guess
-      console.log("Not long enough!");
+      showAlert("Not enough letters!");
       return;
     }
 
@@ -95,12 +100,10 @@ export default function Game() {
     }, "");
 
     if(!isGuessValid(guess)){
-      // TODO make a pop up of this message and animation if you want i guess
-      console.log("Not in word list!");
+      showAlert("Not in word list!");
       return;
     }
 
-    stopInteraction();
     activeTiles.forEach((...params) => setTiles(...params, guess))
   }
 
@@ -127,10 +130,9 @@ export default function Game() {
     }
 
     if(index === array.length - 1) {
-      startInteraction();
       if(checkWin(guess, wordOfDay)){
-        // TODO pop up and whatever idk
-        console.log("Congratulations! You guessed the word");
+        showAlert("Congratulations! You guessed the word");
+        guessed = true;
         stopInteraction();
       }
     }
@@ -140,20 +142,21 @@ export default function Game() {
     const gameboard = window.document.querySelector(`.${styles.gameboard}`);
     return gameboard.querySelectorAll('[data-state="active"]');
   }
-    
-  function getFormattedTime() {
-    const MS_PER_MINUTE = 60000;
-    const MS_PER_SECOND = 1000;
 
-    let time = timeInMS;
-    const minutes = Math.floor(time / MS_PER_MINUTE);
-    time %= MS_PER_MINUTE;
+  function showAlert(message, duration=1000) {
+    const alertContainer = window.document.querySelector("[data-alert-container]");
+    const alert = document.createElement("div");
+    alert.textContent = message;
+    alert.classList.add(`${styles.alert}`)
+    alertContainer.prepend(alert);
+    if (duration == null) return;
 
-    const seconds = Math.floor(time / MS_PER_SECOND);
-    time %= MS_PER_SECOND;
-
-    const zeroPad = (num, places) => String(num).padStart(places, '0');
-    return `${zeroPad(minutes, 2)}:${zeroPad(seconds, 2)}:${zeroPad(time, 2)}`;
+    setTimeout(() => {
+      alert.classList.add(`${styles.hide}`);
+      alert.addEventListener("transitionend", () => {
+        alert.remove();
+      });
+    }, duration);
   }
 
   return (
@@ -163,9 +166,14 @@ export default function Game() {
           <TimerIcon color="inherit" />
         </Grid>
         <Grid item xs={6} sx={{ paddingLeft: '5px' }}>
-          <Typography>{getFormattedTime()}</Typography>
+          <Typography>{getFormattedTime(timeInMs)}</Typography>
         </Grid>
       </Grid>
+      <div data-start-button className={styles.startButtonContainer}>
+        <button className={styles.startButton} onClick={startGame}>START</button>
+      </div>
+      <div data-alert-container className={styles.alertContainer}>
+      </div>
       <div className={styles.gameboard}>
         <div className={styles.tile}></div>
         <div className={styles.tile}></div>
@@ -200,93 +208,93 @@ export default function Game() {
       </div>
       <div className={styles.keyboard}>
         <div className={styles.keyboardRow}>
-          <button className={styles.key} data-key="Q" onClick={startInteraction}>
+          <button className={styles.key} data-key="Q" >
             Q
           </button>
-          <button className={styles.key} data-key="W" onClick={startInteraction}>
+          <button className={styles.key} data-key="W" >
             W
           </button>
-          <button className={styles.key} data-key="E" onClick={startInteraction}>
+          <button className={styles.key} data-key="E" >
             E
           </button>
-          <button className={styles.key} data-key="R" onClick={startInteraction}>
+          <button className={styles.key} data-key="R" >
             R
           </button>
-          <button className={styles.key} data-key="T" onClick={startInteraction}>
+          <button className={styles.key} data-key="T" >
             T
           </button>
-          <button className={styles.key} data-key="Y" onClick={startInteraction}>
+          <button className={styles.key} data-key="Y" >
             Y
           </button>
-          <button className={styles.key} data-key="U" onClick={startInteraction}>
+          <button className={styles.key} data-key="U" >
             U
           </button>
-          <button className={styles.key} data-key="I" onClick={startInteraction}>
+          <button className={styles.key} data-key="I" >
             I
           </button>
-          <button className={styles.key} data-key="O" onClick={startInteraction}>
+          <button className={styles.key} data-key="O" >
             O
           </button>
-          <button className={styles.key} data-key="P" onClick={startInteraction}>
+          <button className={styles.key} data-key="P" >
             P
           </button>
         </div>
 
         <div className={styles.space}></div>
         <div className={styles.keyboardRow}>
-          <button className={styles.key} data-key="A" onClick={startInteraction}>
+          <button className={styles.key} data-key="A" >
             A
           </button>
-          <button className={styles.key} data-key="S" onClick={startInteraction}>
+          <button className={styles.key} data-key="S" >
             S
           </button>
-            <button className={styles.key} data-key="D" onClick={startInteraction}>
+            <button className={styles.key} data-key="D" >
             D
           </button>
-          <button className={styles.key} data-key="F" onClick={startInteraction}>
+          <button className={styles.key} data-key="F" >
             F
           </button>
-          <button className={styles.key} data-key="G" onClick={startInteraction}>
+          <button className={styles.key} data-key="G" >
             G
           </button>
-          <button className={styles.key} data-key="H" onClick={startInteraction}>
+          <button className={styles.key} data-key="H" >
             H
           </button>
-          <button className={styles.key} data-key="J" onClick={startInteraction}>
+          <button className={styles.key} data-key="J" >
             J
           </button>
-          <button className={styles.key} data-key="K" onClick={startInteraction}>
+          <button className={styles.key} data-key="K" >
             K
           </button>
-          <button className={styles.key} data-key="L" onClick={startInteraction}>
+          <button className={styles.key} data-key="L" >
             L
           </button>
         </div>
         <div className={styles.space}></div>
         <div className={styles.keyboardRow}>
-          <button data-enter className={styles.keyLarge} onClick={startInteraction}>ENTER</button>
-          <button className={styles.key} data-key="Z" onClick={startInteraction}>
+          <button data-enter className={styles.keyLarge} >ENTER</button>
+          <button className={styles.key} data-key="Z" >
             Z
           </button>
-          <button className={styles.key} data-key="X" onClick={startInteraction}>
+          <button className={styles.key} data-key="X" >
             X
           </button>
-          <button className={styles.key} data-key="C" onClick={startInteraction}>
+          <button className={styles.key} data-key="C" >
             C
           </button>
-          <button className={styles.key} data-key="V" onClick={startInteraction}>
+          <button className={styles.key} data-key="V" >
             V
           </button>
-          <button className={styles.key} data-key="B" onClick={startInteraction}>
+          <button className={styles.key} data-key="B" >
             B
           </button>
-          <button className={styles.key} data-key="N" onClick={startInteraction}>
+          <button className={styles.key} data-key="N" >
             N
           </button>
-          <button className={styles.key} data-key="M" onClick={startInteraction}>
+          <button className={styles.key} data-key="M" >
             M
           </button>
-          <button data-delete className={styles.keyLarge} onClick={startInteraction}><BackspaceIcon /></button>
+          <button data-delete className={styles.keyLarge} ><BackspaceIcon /></button>
         </div>
       </div>
     </Container>
