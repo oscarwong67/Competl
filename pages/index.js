@@ -36,48 +36,61 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {session && (<AppBar position="static">
-        <Toolbar>
-          <Box display="flex" flexGrow={1}>
-            {/* Left Side */}
+      {session && (
+        <AppBar position="static">
+          <Toolbar>
+            <Box display="flex" flexGrow={1}>
+              {/* Left Side */}
+              <IconButton
+                size="large"
+                edge="start"
+                color="inherit"
+                aria-label="menu"
+                sx={{ mr: 2 }}
+                onClick={toggleDrawer}
+              >
+                <WorkspacePremiumIcon />
+                <ArrowForwardIosIcon />
+              </IconButton>
+              <Leaderboard
+                isOpen={isLeaderboardOpen}
+                toggleDrawer={toggleDrawer}
+              />
+              <Typography
+                variant="h6"
+                nowrap="true"
+                component="div"
+                sx={{
+                  flexGrow: 1,
+                  display: { xs: "block", alignSelf: "center" },
+                }}
+              >
+                Competl
+              </Typography>
+            </Box>
             <IconButton
               size="large"
-              edge="start"
               color="inherit"
-              aria-label="menu"
+              aria-label="help"
               sx={{ mr: 2 }}
-              onClick={toggleDrawer}
             >
-              <WorkspacePremiumIcon />
-              <ArrowForwardIosIcon />
+              {/* <HelpOutlineIcon /> */}
+              <HelpMenu />
             </IconButton>
-            <Leaderboard
-              isOpen={isLeaderboardOpen}
-              toggleDrawer={toggleDrawer}
-            />
-            <Typography variant="h6" nowrap="true" component="div" sx={{ flexGrow: 1, display: { xs: 'block', alignSelf: 'center' } }}>Competl</Typography>
-          </Box>
-          <IconButton
-            size="large"
-            color="inherit"
-            aria-label="help"
-            sx={{ mr: 2 }}
-          >
-            {/* <HelpOutlineIcon /> */}
-            <HelpMenu />
-          </IconButton>
-          <IconButton
-            size="large"
-            color="inherit"
-            aria-label="profile"
-            sx={{ mr: 2 }}
-          >
-            {/* <AccountCircleIcon /> */}
-            <EditProfile />
-          </IconButton>
-        </Toolbar>
-      </AppBar>)}
+            <IconButton
+              size="large"
+              color="inherit"
+              aria-label="profile"
+              sx={{ mr: 2 }}
+            >
+              {/* <AccountCircleIcon /> */}
+              <EditProfile />
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+      )}
       <main className={styles.main}>
+        <p className={styles.description}>Competl</p>
         {/* <p className={styles.description}>A competitive word guessing game.</p> */}
         <Game />
         <Login disableBackdropClick />
