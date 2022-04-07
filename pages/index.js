@@ -81,7 +81,7 @@ export default function Home() {
         userId={session && session.user ? session.user._id : ''}/>
       <main className={styles.main}>
         {/* <p className={styles.description}>A competitive word guessing game.</p> */}
-        <Game popupOpen={openProfileMenu || openNewUserPopup}/> {/* TODO: Add help menu too */}
+        <Game/> {/* TODO: Add help menu too */}
         <Login disableBackdropClick />
       </main>
       <footer className={styles.footer}>
