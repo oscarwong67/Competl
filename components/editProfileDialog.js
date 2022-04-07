@@ -12,10 +12,9 @@ import styles from '../styles/Home.module.css';
 import { signOut } from "next-auth/react"
 
 
-export default function ProfileMenu() {
-  // dummy comment
+export default function EditProfileDialog({ userId, currUsername, openCallback, isOpen }) {
+  const [usernameValue, setUsernameValue] = React.useState(currUsername);
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [open, setOpen] = React.useState(false);
   const openMenu = Boolean(anchorEl);
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -24,10 +23,41 @@ export default function ProfileMenu() {
     setAnchorEl(null);
   };
   const handleClickOpen = () => {
-    setOpen(true);
+    openCallback(true);
   };
   const handleClose = () => {
-    setOpen(false);
+    openCallback(false);
+  };
+
+  const updateUserName = async (userId, usernameValue) => {
+    await fetch('/api/user/updateUsername', {
+      method: 'POST',
+      body: JSON.stringify({
+        userId: userId,
+        username: usernameValue,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  };
+
+  const handleSave = () => {
+    if (checkValidUsername(usernameValue)) {
+      // Call username backend function
+      updateUserName(userId, usernameValue);
+      handleClose(false);
+    }
+  }
+
+  const handleTextInput = (e) => {
+    setUsernameValue(e.target.value);
+  }
+
+  const checkValidUsername = (username) => {
+    // TODO: profanity filter
+    if (username.length <= 0) return false;
+    return true;
   };
 
   return (
@@ -53,7 +83,7 @@ export default function ProfileMenu() {
         <MenuItem onClick={signOut}>Logout</MenuItem>
       </Menu>
 
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog open={isOpen} onClose={handleClose}>
         <DialogTitle>Edit Profile</DialogTitle>
         <DialogContent sx={{ width: 385 }}>
           <TextField
@@ -64,11 +94,13 @@ export default function ProfileMenu() {
             type="email"
             fullWidth
             variant="standard"
+            defaultValue={currUsername}
+            onChange={handleTextInput}
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleClose}>Save</Button>
+          <Button onClick={handleSave}>Save</Button>
         </DialogActions>
       </Dialog>
     </div>
