@@ -19,6 +19,7 @@ export default function Game() {
   });
 
   function startGame () {
+    console.log('Game Started');
     const button = window.document.querySelector("[data-start-button]");
     button.classList.add(`${styles.hide}`);
 
@@ -27,12 +28,13 @@ export default function Game() {
   }
 
   function stopInteraction() {
-    console.log("wht")
+    console.log("Interaction Stopped")
     window.document.removeEventListener("click", handleMouseClick);
     window.document.removeEventListener("keydown", handleKeyPress);
   }
 
   const handleMouseClick = (e) => {
+    console.log(e.target.parentNode);
     if(guessed) return;
 
     if (e.target.matches("[data-key]")) {
@@ -44,8 +46,14 @@ export default function Game() {
       submitWord();
       return;
     }
-
-    if(e.target.matches("[data-delete]")) {
+    if (
+      e.target.matches("[data-delete]") ||
+      (e.target.parentNode && e.target.parentNode.matches("[data-delete]")) ||
+      // Backspace icon path
+      (e.target.getAttribute('d') && e.target.getAttribute('d').matches(
+        "M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.11c.36.53.9.89 1.59.89h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-3 12.59L17.59 17 14 13.41 10.41 17 9 15.59 12.59 12 9 8.41 10.41 7 14 10.59 17.59 7 19 8.41 15.41 12 19 15.59z"
+      ))
+    ) {
       deleteLetter();
       return;
     }
@@ -164,18 +172,19 @@ export default function Game() {
   return (
     <Container className={styles.gameContainer}>
       <Grid container spacing={2}>
-        <Grid item xs={6} sx={{ textAlign: 'right', paddingLeft: '0px' }}>
+        <Grid item xs={6} sx={{ textAlign: "right", paddingLeft: "0px" }}>
           <TimerIcon color="inherit" />
         </Grid>
-        <Grid item xs={6} sx={{ paddingLeft: '5px' }}>
+        <Grid item xs={6} sx={{ paddingLeft: "5px" }}>
           <Typography>{getFormattedTime(timeInMs)}</Typography>
         </Grid>
       </Grid>
       <div data-start-button className={styles.startButtonContainer}>
-        <button className={styles.startButton} onClick={startGame}>START</button>
+        <button className={styles.startButton} onClick={startGame}>
+          START
+        </button>
       </div>
-      <div data-alert-container className={styles.alertContainer}>
-      </div>
+      <div data-alert-container className={styles.alertContainer}></div>
       <div className={styles.gameboard}>
         <div className={styles.tile}></div>
         <div className={styles.tile}></div>
@@ -210,93 +219,97 @@ export default function Game() {
       </div>
       <div className={styles.keyboard}>
         <div className={styles.keyboardRow}>
-          <button className={styles.key} data-key="Q" >
+          <button className={styles.key} data-key="Q">
             Q
           </button>
-          <button className={styles.key} data-key="W" >
+          <button className={styles.key} data-key="W">
             W
           </button>
-          <button className={styles.key} data-key="E" >
+          <button className={styles.key} data-key="E">
             E
           </button>
-          <button className={styles.key} data-key="R" >
+          <button className={styles.key} data-key="R">
             R
           </button>
-          <button className={styles.key} data-key="T" >
+          <button className={styles.key} data-key="T">
             T
           </button>
-          <button className={styles.key} data-key="Y" >
+          <button className={styles.key} data-key="Y">
             Y
           </button>
-          <button className={styles.key} data-key="U" >
+          <button className={styles.key} data-key="U">
             U
           </button>
-          <button className={styles.key} data-key="I" >
+          <button className={styles.key} data-key="I">
             I
           </button>
-          <button className={styles.key} data-key="O" >
+          <button className={styles.key} data-key="O">
             O
           </button>
-          <button className={styles.key} data-key="P" >
+          <button className={styles.key} data-key="P">
             P
           </button>
         </div>
 
         <div className={styles.space}></div>
         <div className={styles.keyboardRow}>
-          <button className={styles.key} data-key="A" >
+          <button className={styles.key} data-key="A">
             A
           </button>
-          <button className={styles.key} data-key="S" >
+          <button className={styles.key} data-key="S">
             S
           </button>
-            <button className={styles.key} data-key="D" >
+          <button className={styles.key} data-key="D">
             D
           </button>
-          <button className={styles.key} data-key="F" >
+          <button className={styles.key} data-key="F">
             F
           </button>
-          <button className={styles.key} data-key="G" >
+          <button className={styles.key} data-key="G">
             G
           </button>
-          <button className={styles.key} data-key="H" >
+          <button className={styles.key} data-key="H">
             H
           </button>
-          <button className={styles.key} data-key="J" >
+          <button className={styles.key} data-key="J">
             J
           </button>
-          <button className={styles.key} data-key="K" >
+          <button className={styles.key} data-key="K">
             K
           </button>
-          <button className={styles.key} data-key="L" >
+          <button className={styles.key} data-key="L">
             L
           </button>
         </div>
         <div className={styles.space}></div>
         <div className={styles.keyboardRow}>
-          <button data-enter className={styles.keyLarge} >ENTER</button>
-          <button className={styles.key} data-key="Z" >
+          <button data-enter className={styles.keyLarge}>
+            ENTER
+          </button>
+          <button className={styles.key} data-key="Z">
             Z
           </button>
-          <button className={styles.key} data-key="X" >
+          <button className={styles.key} data-key="X">
             X
           </button>
-          <button className={styles.key} data-key="C" >
+          <button className={styles.key} data-key="C">
             C
           </button>
-          <button className={styles.key} data-key="V" >
+          <button className={styles.key} data-key="V">
             V
           </button>
-          <button className={styles.key} data-key="B" >
+          <button className={styles.key} data-key="B">
             B
           </button>
-          <button className={styles.key} data-key="N" >
+          <button className={styles.key} data-key="N">
             N
           </button>
-          <button className={styles.key} data-key="M" >
+          <button className={styles.key} data-key="M">
             M
           </button>
-          <button data-delete className={styles.keyLarge} ><BackspaceIcon /></button>
+          <button data-delete className={styles.keyLarge}>
+            <BackspaceIcon data-delete />
+          </button>
         </div>
       </div>
     </Container>
