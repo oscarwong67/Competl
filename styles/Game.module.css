@@ -160,6 +160,7 @@
   opacity: 1;
   transition: opacity 500ms ease-in-out;
   margin-bottom: 0.5em;
+  text-align: center;
 }
 
 .alert:last-child {
