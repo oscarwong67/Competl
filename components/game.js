@@ -15,11 +15,11 @@ export default function Game() {
 
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {
-    console.log(`Today's word is: ${getWordOfDay().solution.toUpperCase()}`);  
+    console.log(`Today's word is: ${getWordOfDay().solution.toUpperCase()}`);
   });
 
-  function startGame () {
-    console.log('Game Started');
+  function startGame() {
+    console.log("Game Started");
     const button = window.document.querySelector("[data-start-button]");
     button.classList.add(`${styles.hide}`);
 
@@ -28,21 +28,21 @@ export default function Game() {
   }
 
   function stopInteraction() {
-    console.log("Interaction Stopped")
+    console.log("Interaction Stopped");
     window.document.removeEventListener("click", handleMouseClick);
     window.document.removeEventListener("keydown", handleKeyPress);
   }
 
   const handleMouseClick = (e) => {
     console.log(e.target.parentNode);
-    if(guessed) return;
+    if (guessed) return;
 
     if (e.target.matches("[data-key]")) {
       pressKey(e.target.dataset.key);
       return;
     }
 
-    if(e.target.matches("[data-enter]")) {
+    if (e.target.matches("[data-enter]")) {
       submitWord();
       return;
     }
@@ -50,33 +50,36 @@ export default function Game() {
       e.target.matches("[data-delete]") ||
       (e.target.parentNode && e.target.parentNode.matches("[data-delete]")) ||
       // Backspace icon path
-      (e.target.getAttribute('d') && e.target.getAttribute('d').matches(
-        "M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.11c.36.53.9.89 1.59.89h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-3 12.59L17.59 17 14 13.41 10.41 17 9 15.59 12.59 12 9 8.41 10.41 7 14 10.59 17.59 7 19 8.41 15.41 12 19 15.59z"
-      ))
+      (e.target.getAttribute("d") &&
+        e.target
+          .getAttribute("d")
+          .matches(
+            "M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.11c.36.53.9.89 1.59.89h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-3 12.59L17.59 17 14 13.41 10.41 17 9 15.59 12.59 12 9 8.41 10.41 7 14 10.59 17.59 7 19 8.41 15.41 12 19 15.59z"
+          ))
     ) {
       deleteLetter();
       return;
     }
-  }
+  };
 
   const handleKeyPress = (e) => {
-    if(guessed) return;
+    if (guessed) return;
 
-    if(e.key === "Enter") {
+    if (e.key === "Enter") {
       submitWord();
       return;
     }
 
-    if(e.key === "Backspace" || e.key === "Delete"){
+    if (e.key === "Backspace" || e.key === "Delete") {
       deleteLetter();
       return;
     }
 
-    if(e.key.match(/^[a-z]$/)) {
+    if (e.key.match(/^[a-z]$/)) {
       pressKey(e.key);
       return;
     }
-  }
+  };
 
   function pressKey(key) {
     const activeTiles = getActiveTiles();
@@ -90,25 +93,25 @@ export default function Game() {
 
   function deleteLetter() {
     const activeTiles = getActiveTiles();
-    const lastTile = activeTiles[activeTiles.length-1];
-    if(lastTile == null) return;
-    lastTile.textContent = '';
+    const lastTile = activeTiles[activeTiles.length - 1];
+    if (lastTile == null) return;
+    lastTile.textContent = "";
     delete lastTile.dataset.state;
     delete lastTile.dataset.letter;
   }
 
   function submitWord() {
     const activeTiles = [...getActiveTiles()];
-    if (activeTiles.length !== WORD_LENGTH){
+    if (activeTiles.length !== WORD_LENGTH) {
       showAlert("Not enough letters!");
       return;
     }
 
     const guess = activeTiles.reduce((word, tile) => {
-      return word + tile.dataset.letter
+      return word + tile.dataset.letter;
     }, "");
 
-    if(!isGuessValid(guess)){
+    if (!isGuessValid(guess)) {
       showAlert("Not in word list!");
       return;
     }
@@ -116,15 +119,15 @@ export default function Game() {
     activeTiles.forEach((...params) => setTiles(...params, guess))
   }
 
-  function setTiles(tile, index, array, guess){
+  function setTiles(tile, index, array, guess) {
     const wordOfDay = getWordOfDay().solution;
-    const keyboard = window.document.querySelector(`.${styles.keyboard}`)
+    const keyboard = window.document.querySelector(`.${styles.keyboard}`);
     const letter = tile.dataset.letter.toUpperCase();
     const key = keyboard.querySelector(`[data-key="${letter}"]`);
-    
+
     const letterValue = checkLetter(guess, wordOfDay, index);
 
-    switch(letterValue){
+    switch (letterValue) {
       case 2:
         tile.dataset.state = "correct";
         key.classList.add(`${styles.correct}`);
@@ -138,8 +141,8 @@ export default function Game() {
         key.classList.add(`${styles.wrong}`);
     }
 
-    if(index === array.length - 1) {
-      if(checkWin(guess, wordOfDay)){
+    if (index === array.length - 1) {
+      if (checkWin(guess, wordOfDay)) {
         showAlert("Congratulations! You guessed the word");
         guessed = true;
         console.log(guessLine);
@@ -153,11 +156,13 @@ export default function Game() {
     return gameboard.querySelectorAll('[data-state="active"]');
   }
 
-  function showAlert(message, duration=1000) {
-    const alertContainer = window.document.querySelector("[data-alert-container]");
+  function showAlert(message, duration = 1000) {
+    const alertContainer = window.document.querySelector(
+      "[data-alert-container]"
+    );
     const alert = document.createElement("div");
     alert.textContent = message;
-    alert.classList.add(`${styles.alert}`)
+    alert.classList.add(`${styles.alert}`);
     alertContainer.prepend(alert);
     if (duration == null) return;
 
