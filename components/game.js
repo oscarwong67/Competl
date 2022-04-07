@@ -15,6 +15,14 @@ const WORD_LENGTH = 5;
 
 export default function Game() {
   const [timeInMs, setTimeInMs] = useState(0.0);
+  const [isGameStarted, setIsGameStarted] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('isGameStarted');
+      const initialValue = JSON.parse(saved);
+      return initialValue || false;
+    }
+    return false;
+  });
   const [numGuesses, setNumGuesses] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('numGuesses');
@@ -37,8 +45,13 @@ export default function Game() {
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {
     console.log(`Today's word is: ${getWordOfDay().solution.toUpperCase()}`);
-    console.log(localStorage);
-  });
+    if(isGameStarted) {
+      const button = window.document.querySelector("[data-start-button]");
+      button.classList.add(`${styles.hide}`);
+      window.document.addEventListener("click", handleMouseClick);
+      window.document.addEventListener("keydown", handleKeyPress);
+    }
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('numGuesses', numGuesses);
@@ -49,12 +62,16 @@ export default function Game() {
   }, [guesses])
 
   function startGame() {
+    if (isGameStarted) return;
     console.log("Game Started");
     const button = window.document.querySelector("[data-start-button]");
     button.classList.add(`${styles.hide}`);
 
     window.document.addEventListener("click", handleMouseClick);
     window.document.addEventListener("keydown", handleKeyPress);
+
+    localStorage.setItem('isGameStarted', true);
+    setIsGameStarted(true);
   }
 
   function stopInteraction() {
