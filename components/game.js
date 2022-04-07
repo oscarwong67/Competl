@@ -147,6 +147,7 @@ export default function Game() {
 
     if (index === array.length - 1) {
       if (checkWin(guess, wordOfDay)) {
+        // TODO: make api request to update stats and store scores
         showAlert("Congratulations! You guessed the word");
         guessed = true;
         stopInteraction();
