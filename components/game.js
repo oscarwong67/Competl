@@ -28,7 +28,9 @@ export default function Game() {
   }, []);
 
   function startGame() {
-    if (isGameStarted) { return; }
+    if (isGameStarted) {
+      return;
+    }
     setIsGameStarted(true);
     const button = window.document.querySelector("[data-start-button]");
     button.classList.add(`${styles.hide}`);
@@ -156,7 +158,7 @@ export default function Game() {
         setIsGuessed(true);
         stopInteraction();
         onGameCompletion(true);
-      } else if (numGuesses === 6) {        
+      } else if (numGuesses === 6) {
         showAlert("You lost!");
         stopInteraction();
         onGameCompletion(false);
@@ -165,19 +167,22 @@ export default function Game() {
   }
 
   async function onGameCompletion(isWin) {
-    const positionRes = await fetch('/api/scores/addScore', {
-      method: "POST",
-      body: JSON.stringify({
-        userId: session.user._id,
-        timeInMs,
-        numGuesses,
-        dateString: new Date().toString(),
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const position = await positionRes.json();
+    let position = Number.MAX_SAFE_INTEGER;
+    if (isWin) {
+      const positionRes = await fetch("/api/scores/addScore", {
+        method: "POST",
+        body: JSON.stringify({
+          userId: session.user._id,
+          timeInMs,
+          numGuesses,
+          dateString: new Date().toString(),
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      position = await positionRes.json();
+    }
     await fetch("/api/stats/updateStats", {
       method: "POST",
       body: JSON.stringify({
@@ -190,7 +195,7 @@ export default function Game() {
         "Content-Type": "application/json",
       },
     });
-    // TODO: cause a leaderboard refresh somehow
+    props.refreshLeaderboard();
   }
 
   function getActiveTiles() {

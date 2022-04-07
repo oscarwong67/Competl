@@ -12,11 +12,11 @@ import styles from "../styles/Statistics.module.css";
 
 export default function Statistics(props) {
   const { data: session } = useSession();
-  const [stats, setStats] = useState({});
   const [guessDistributionProportions, setGuessDistributionProportions] = useState(
     {}
   );
   const [isMacOsLike, setIsMacOsLike] = useState(false);
+  const { fetchStats } = props;
 
   useEffect(() => {
     function calcGuessDistributionProportions(guessDistribution) {
@@ -35,34 +35,22 @@ export default function Statistics(props) {
         proportions[key] = guessDistribution[key] / max;
       });
       setGuessDistributionProportions(proportions);
-    };
-
-    async function fetchStats() {
-      const res = await fetch(`/api/stats/getStats?userId=${session.user._id}`);
-      const fetchedStats = await res.json();
-      const {
-        currentStreak,
-        guessDistribution,
-        highestLeaderPosition,
-        maxStreak,
-        numGamesPlayed,
-        numGamesWon,
-      } = fetchedStats;
-      setStats({
-        currentStreak,
-        guessDistribution,
-        highestLeaderPosition,
-        maxStreak,
-        numGamesPlayed,
-        numGamesWon,
-      });
-      calcGuessDistributionProportions(guessDistribution);
     }
-    fetchStats();
+    
+    const fetchStatsWrapper = async () => {
+      console.log("Fetching Stats on First Load");
+      const fetchedStats = await fetchStats();
+      calcGuessDistributionProportions(fetchedStats.guessDistribution);
+    }
+    fetchStatsWrapper();
     if (navigator.userAgent.search("Mac OS") != -1) {
       setIsMacOsLike(true);
     }
-  }, [session.user._id]);
+  }, []);
+
+  useEffect(() => {
+
+  })
 
   const getShareIcon = () => {
     if (isMacOsLike) {
@@ -73,7 +61,7 @@ export default function Statistics(props) {
   };
 
   const renderGuessDistribution = () => {
-    if (!(stats.guessDistribution)) return null;
+    if (!(props.stats.guessDistribution)) return null;
     const guessDistributionElements = [1, 2, 3, 4, 5, 6].map((num) => (
       <Grid item container key={num}>
         <Grid item xs={2}>
@@ -87,7 +75,7 @@ export default function Statistics(props) {
         </Grid>
         <Grid item xs={1} sx={{ textAlign: "center" }}>
           <Typography variant="subtitle1" className={styles.accentedText}>
-            {stats.guessDistribution[num]}
+            {props.stats.guessDistribution[num]}
           </Typography>
         </Grid>
       </Grid>
@@ -131,28 +119,28 @@ export default function Statistics(props) {
       </Grid>
       <Grid container spacing={2} justifyContent="space-around">
         <Grid item xs={2}>
-          <Typography variant="h6">&nbsp;{stats.numGamesPlayed}</Typography>
+          <Typography variant="h6">&nbsp;{props.stats.numGamesPlayed}</Typography>
           <Typography variant="p">&nbsp;Played</Typography>
         </Grid>
         <Grid item xs={2}>
           <Typography variant="h6">
-            {Math.floor((stats.numGamesWon * 100) / stats.numGamesPlayed) ||
+            {Math.floor((props.stats.numGamesWon * 100) / props.stats.numGamesPlayed) ||
               "-"}
             %
           </Typography>
           <Typography variant="p">Win %</Typography>
         </Grid>
         <Grid item xs={2}>
-          <Typography variant="h6">{stats.currentStreak}</Typography>
+          <Typography variant="h6">{props.stats.currentStreak}</Typography>
           <Typography variant="p">Current Streak</Typography>
         </Grid>
         <Grid item xs={2}>
-          <Typography variant="h6">{stats.maxStreak}</Typography>
+          <Typography variant="h6">{props.stats.maxStreak}</Typography>
           <Typography variant="p">Max Streak</Typography>
         </Grid>
         <Grid item xs={4}>
           <Typography variant="h6">
-            {stats.highestLeaderPosition || "-"}
+            {props.stats.highestLeaderPosition || "-"}
           </Typography>
           <Typography variant="p">Highest Leaderboard Position</Typography>
         </Grid>

@@ -23,6 +23,7 @@ export default NextAuth({
   ],
   callbacks: {
     async jwt({ token, account }) {
+      console.log("Fetching session details for " + token.email);
 
       // Persist the OAuth access_token to the token right after signin
       if (account) {

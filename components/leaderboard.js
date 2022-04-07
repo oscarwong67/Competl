@@ -17,20 +17,16 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { getFormattedTime } from "../lib/utils";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import IconButton from "@mui/material/IconButton";
 
 export default function Leaderboard(props) {
-  const [scores, setScores] = useState([]);
-  const [nameSearchQuery, setNameSearchQuery] = useState('');
+  const [nameSearchQuery, setNameSearchQuery] = useState("");
+  const { fetchScores } = props;
 
   // only runs on component mount
   useEffect(() => {
-    async function fetchScores() {
-      const res = await fetch(
-        `/api/scores/getScores?dateString=${new Date().toString()}`
-      );
-      const todayScores = await res.json();
-      setScores(todayScores);
-    }
+    console.log("Fetching Scores on First Load");
     fetchScores();
   }, []);
 
@@ -46,7 +42,7 @@ export default function Leaderboard(props) {
         sx: { width: "90%" },
       }}
     >
-      <Statistics back={props.toggleDrawer} />
+      <Statistics back={props.toggleDrawer} fetchStats={props.fetchStats} stats={props.stats} />
       <Divider />
       <Box>
         <WorkspacePremiumIcon />
@@ -62,10 +58,17 @@ export default function Leaderboard(props) {
         spacing={2}
         justifyContent="center"
       >
-        <Grid item xs={12}>
+        {/* Spacer */}
+        <Grid item xs={2} />
+        <Grid item xs={8}>
           <Typography variant="h6" component="div" gutterBottom align="center">
             Filter By # Guesses
           </Typography>
+        </Grid>
+        <Grid item xs={2}>
+          <IconButton size="large" aria-label="back" onClick={props.fetchScores}>
+            <RefreshIcon />
+          </IconButton>
         </Grid>
         {/* # Guess Buttons */}
         <Grid container item xs={12} sm={9} spacing={1} align="center">
@@ -130,7 +133,7 @@ export default function Leaderboard(props) {
             <TableBody>
               {/* TODO: scrolling - might need to use datagrid instead, but maybe we can do it manually too */}
               {/* Also look at https://mui.com/components/tables/#sticky-header */}
-              {scores.map((score, idx) => (
+              {props.scores.map((score, idx) => (
                 <TableRow
                   key={idx + 1}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
