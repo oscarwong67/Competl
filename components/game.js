@@ -15,13 +15,38 @@ const WORD_LENGTH = 5;
 
 export default function Game() {
   const [timeInMs, setTimeInMs] = useState(0.0);
-  const [numGuesses, setNumGuesses] = useState(0);
+  const [numGuesses, setNumGuesses] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('numGuesses');
+      const initialValue = JSON.parse(saved);
+      return initialValue || 0;
+    }
+    return 0;
+  });
+  const [guesses, setGuesses] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('guesses');
+      const initialValue = JSON.parse(saved);
+      return initialValue || [];
+    }
+    return [];
+  });
+  
   let guessed = false;
 
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {
     console.log(`Today's word is: ${getWordOfDay().solution.toUpperCase()}`);
+    console.log(localStorage);
   });
+
+  useEffect(() => {
+    localStorage.setItem('numGuesses', numGuesses);
+  }, [numGuesses])
+
+  useEffect(() => {
+    localStorage.setItem('guesses', JSON.stringify(guesses));
+  }, [guesses])
 
   function startGame() {
     console.log("Game Started");
@@ -120,7 +145,8 @@ export default function Game() {
       showAlert("Not in word list!");
       return;
     }
-    setNumGuesses(numGuesses + 1);
+    setNumGuesses(numGuesses => numGuesses + 1);
+    setGuesses(guesses => [...guesses, guess]);
     activeTiles.forEach((...params) => setTiles(...params, guess))
   }
 
