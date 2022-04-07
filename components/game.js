@@ -165,8 +165,7 @@ export default function Game() {
   }
 
   async function onGameCompletion(isWin) {
-    console.log(numGuesses);
-    const position = await fetch('/api/scores/addScore', {
+    const positionRes = await fetch('/api/scores/addScore', {
       method: "POST",
       body: JSON.stringify({
         userId: session.user._id,
@@ -178,6 +177,7 @@ export default function Game() {
         "Content-Type": "application/json",
       },
     });
+    const position = await positionRes.json();
     await fetch("/api/stats/updateStats", {
       method: "POST",
       body: JSON.stringify({
