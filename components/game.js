@@ -15,6 +15,7 @@ const WORD_LENGTH = 5;
 
 export default function Game() {
   const [timeInMs, setTimeInMs] = useState(0.0);
+  const [numGuesses, setNumGuesses] = useState(0);
   let guessed = false;
 
   // Similar to componentDidMount and componentDidUpdate:
@@ -119,8 +120,8 @@ export default function Game() {
       showAlert("Not in word list!");
       return;
     }
-
-    activeTiles.forEach((...params) => setTiles(...params, guess));
+    setNumGuesses(numGuesses + 1);
+    activeTiles.forEach((...params) => setTiles(...params, guess))
   }
 
   function setTiles(tile, index, array, guess) {
@@ -147,10 +148,11 @@ export default function Game() {
 
     if (index === array.length - 1) {
       if (checkWin(guess, wordOfDay)) {
-        // TODO: make api request to update stats and store scores
         showAlert("Congratulations! You guessed the word");
         guessed = true;
         stopInteraction();
+
+        // fetch(`/api/scores/putScore?`)
       }
     }
   }
