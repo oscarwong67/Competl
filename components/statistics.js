@@ -11,7 +11,7 @@ import IconButton from "@mui/material/IconButton";
 import styles from "../styles/Statistics.module.css";
 
 export default function Statistics(props) {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const [stats, setStats] = useState({});
   const [guessDistributionProportions, setGuessDistributionProportions] = useState(
     {}

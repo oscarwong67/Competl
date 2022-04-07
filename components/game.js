@@ -1,25 +1,35 @@
-import TimerIcon from '@mui/icons-material/Timer';
-import { Grid, Typography, Container } from '@mui/material';
-import styles from '../styles/Game.module.css';
-import BackspaceIcon from '@mui/icons-material/Backspace';
-import { useState, useEffect } from 'react';
-import { getWordOfDay, isGuessValid, checkLetter, checkWin } from '../lib/words';
-import { getFormattedTime } from '../lib/utils';
+import TimerIcon from "@mui/icons-material/Timer";
+import { Grid, Typography, Container } from "@mui/material";
+import { useSession } from "next-auth/react";
+import styles from "../styles/Game.module.css";
+import BackspaceIcon from "@mui/icons-material/Backspace";
+import { useState, useEffect } from "react";
+import {
+  getWordOfDay,
+  isGuessValid,
+  checkLetter,
+  checkWin,
+} from "../lib/words";
+import { getFormattedTime } from "../lib/utils";
 
 const WORD_LENGTH = 5;
 
 export default function Game() {
   const [timeInMs, setTimeInMs] = useState(0.0);
-  const [numGuesses, setNumGuesses] = useState(0);
-  let guessed = false;
+  const [isGuessed, setIsGuessed] = useState(false);
+  const [isGameStarted, setIsGameStarted] = useState(false);
+
+  let numGuesses = 0;
+  const { data: session } = useSession();
 
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {
     console.log(`Today's word is: ${getWordOfDay().solution.toUpperCase()}`);
-  });
+  }, []);
 
   function startGame() {
-    console.log("Game Started");
+    if (isGameStarted) { return; }
+    setIsGameStarted(true);
     const button = window.document.querySelector("[data-start-button]");
     button.classList.add(`${styles.hide}`);
 
@@ -34,8 +44,7 @@ export default function Game() {
   }
 
   const handleMouseClick = (e) => {
-    console.log(e.target.parentNode);
-    if (guessed) return;
+    if (isGuessed) return;
 
     if (e.target.matches("[data-key]")) {
       pressKey(e.target.dataset.key);
@@ -63,7 +72,7 @@ export default function Game() {
   };
 
   const handleKeyPress = (e) => {
-    if (guessed) return;
+    if (isGuessed) return;
 
     if (e.key === "Enter") {
       submitWord();
@@ -115,8 +124,8 @@ export default function Game() {
       showAlert("Not in word list!");
       return;
     }
-    setNumGuesses(numGuesses + 1);
-    activeTiles.forEach((...params) => setTiles(...params, guess))
+    numGuesses++;
+    activeTiles.forEach((...params) => setTiles(...params, guess));
   }
 
   function setTiles(tile, index, array, guess) {
@@ -144,12 +153,44 @@ export default function Game() {
     if (index === array.length - 1) {
       if (checkWin(guess, wordOfDay)) {
         showAlert("Congratulations! You guessed the word");
-        guessed = true;
+        setIsGuessed(true);
         stopInteraction();
-
-        // fetch(`/api/scores/putScore?`)
+        onGameCompletion(true);
+      } else if (numGuesses === 6) {        
+        showAlert("You lost!");
+        stopInteraction();
+        onGameCompletion(false);
       }
     }
+  }
+
+  async function onGameCompletion(isWin) {
+    const positionRes = await fetch('/api/scores/addScore', {
+      method: "POST",
+      body: JSON.stringify({
+        userId: session.user._id,
+        timeInMs,
+        numGuesses,
+        dateString: new Date().toString(),
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const position = await positionRes.json();
+    await fetch("/api/stats/updateStats", {
+      method: "POST",
+      body: JSON.stringify({
+        userId: session.user._id,
+        isWin,
+        numGuesses,
+        leaderboardPosition: position,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    // TODO: cause a leaderboard refresh somehow
   }
 
   function getActiveTiles() {
