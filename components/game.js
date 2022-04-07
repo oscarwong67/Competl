@@ -18,6 +18,7 @@ export default function Game() {
   const [timeInMs, setTimeInMs] = useState(0.0);
   const [isGuessed, setIsGuessed] = useState(false);
   const [isGameStarted, setIsGameStarted] = useState(false);
+  const [isGameComplete, setIsGameComplete] = useState(false);
 
   let numGuesses = 0;
   const { data: session } = useSession();
@@ -156,10 +157,12 @@ export default function Game() {
         setIsGuessed(true);
         stopInteraction();
         onGameCompletion(true);
+        setIsGameComplete(true);
       } else if (numGuesses === 6) {        
         showAlert("You lost!");
         stopInteraction();
         onGameCompletion(false);
+        setIsGameComplete(true);
       }
     }
   }
