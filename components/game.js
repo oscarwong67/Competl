@@ -1,5 +1,5 @@
 import TimerIcon from '@mui/icons-material/Timer';
-import { Grid, Typography, Container, Snackbar } from '@mui/material';
+import { Grid, Typography, Container } from '@mui/material';
 import styles from '../styles/Game.module.css';
 import BackspaceIcon from '@mui/icons-material/Backspace';
 import { useState, useEffect } from 'react';
