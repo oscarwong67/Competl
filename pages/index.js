@@ -3,7 +3,6 @@ import Image from 'next/image'
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import IconButton from "@mui/material/IconButton";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
@@ -12,18 +11,28 @@ import Typography from '@mui/material/Typography';
 
 import Game from '../components/game';
 import Login from '../components/login';
-import SetUsername from '../components/setUsername';
-import Leaderboard from "../components/leaderboard";
 import styles from '../styles/Home.module.css';
-import HelpMenu from '../components/helpMenu';
-import EditProfile from '../components/editProfile';
-import { useState } from 'react';
+import HelpMenuDialog from '../components/helpMenuDialog';
+import EditProfileDialog from '../components/editProfileDialog';
+import NewUserDialog from '../components/newUserDialog';
+import Leaderboard from "../components/leaderboard";
 import { signIn, signOut, useSession } from "next-auth/react"
+import { useEffect, useState } from 'react';
 
 
 export default function Home() {
-  const { data: session, status } = useSession();
+  const { data: session, status } = useSession()
+  const [openProfileMenu, setOpenProfileMenu] = useState(false);
+  const [openNewUserPopup, setOpenNewUserPopup] = useState(false);
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+
+  useEffect(() => {
+    if (session && session.user && !session.user.username) {
+      setOpenNewUserPopup(true);
+    } else {
+      setOpenNewUserPopup(false);
+    }
+  }, [session])
 
   const toggleDrawer = () => {
     setIsLeaderboardOpen(!isLeaderboardOpen);
@@ -36,48 +45,66 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {session && (<AppBar position="static">
-        <Toolbar>
-          <Box display="flex" flexGrow={1}>
-            {/* Left Side */}
+      {session && (
+        <AppBar position="static">
+          <Toolbar>
+            <Box display="flex" flexGrow={1}>
+              {/* Left Side */}
+              <IconButton
+                size="large"
+                edge="start"
+                color="inherit"
+                aria-label="menu"
+                sx={{ mr: 2 }}
+                onClick={toggleDrawer}
+              >
+                <WorkspacePremiumIcon />
+                <ArrowForwardIosIcon />
+              </IconButton>
+              <Leaderboard
+                isOpen={isLeaderboardOpen}
+                toggleDrawer={toggleDrawer}
+              />
+              <Typography
+                variant="h6"
+                nowrap="true"
+                component="div"
+                sx={{
+                  flexGrow: 1,
+                  display: { xs: "block", alignSelf: "center" },
+                }}
+              >
+                Competl
+              </Typography>
+            </Box>
             <IconButton
               size="large"
-              edge="start"
               color="inherit"
-              aria-label="menu"
+              aria-label="help"
               sx={{ mr: 2 }}
-              onClick={toggleDrawer}
             >
-              <WorkspacePremiumIcon />
-              <ArrowForwardIosIcon />
+              {/* <HelpOutlineIcon /> */}
+              <HelpMenuDialog />
             </IconButton>
-            <Leaderboard
-              isOpen={isLeaderboardOpen}
-              toggleDrawer={toggleDrawer}
-            />
-            <Typography variant="h6" nowrap="true" component="div" sx={{ flexGrow: 1, display: { xs: 'block', alignSelf: 'center' } }}>Competl</Typography>
-          </Box>
-          <IconButton
-            size="large"
-            color="inherit"
-            aria-label="help"
-            sx={{ mr: 2 }}
-          >
-            {/* <HelpOutlineIcon /> */}
-            <HelpMenu />
-          </IconButton>
-          <IconButton
-            size="large"
-            color="inherit"
-            aria-label="profile"
-            sx={{ mr: 2 }}
-          >
-            {/* <AccountCircleIcon /> */}
-            <EditProfile />
-          </IconButton>
-        </Toolbar>
-      </AppBar>)}
+            <IconButton
+              size="large"
+              color="inherit"
+              aria-label="profile"
+              sx={{ mr: 2 }}
+            >
+              {/* <AccountCircleIcon /> */}
+              <EditProfileDialog openCallback={setOpenProfileMenu}
+                isOpen={openProfileMenu}
+                userId={session && session.user ? session.user._id : '' } 
+                currUsername={session && session.user ? session.user.username : ''}/>
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+      )}
+      <NewUserDialog newAccount={openNewUserPopup} 
+        userId={session && session.user ? session.user._id : ''}/>
       <main className={styles.main}>
+        <p className={styles.description}>Competl</p>
         {/* <p className={styles.description}>A competitive word guessing game.</p> */}
         <Game />
         <Login disableBackdropClick />
