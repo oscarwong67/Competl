@@ -14,7 +14,7 @@ import { getFormattedTime } from "../lib/utils";
 
 const WORD_LENGTH = 5;
 
-export default function Game() {
+export default function Game(props) {
   const [timeInMs, setTimeInMs] = useState(0.0);
   const [isGuessed, setIsGuessed] = useState(false);
   const [isGameStarted, setIsGameStarted] = useState(false);

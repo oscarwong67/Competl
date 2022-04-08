@@ -28,7 +28,7 @@ export default function Leaderboard(props) {
   useEffect(() => {
     console.log("Fetching Scores on First Load");
     fetchScores();
-  }, []);
+  }, [fetchScores]);
 
   return (
     <Drawer

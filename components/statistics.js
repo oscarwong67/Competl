@@ -17,9 +17,24 @@ export default function Statistics(props) {
   );
   const [isMacOsLike, setIsMacOsLike] = useState(false);
   const { fetchStats } = props;
+  const { guessDistribution } = props.stats;
 
+  // Fetch stats on first load
+  useEffect(() => {    
+    const fetchStatsWrapper = async () => {
+      console.log("Fetching Stats on First Load");
+      await fetchStats();
+    }
+    fetchStatsWrapper();
+    if (navigator.userAgent.search("Mac OS") != -1) {
+      setIsMacOsLike(true);
+    }
+  }, [fetchStats]);
+
+  // Recalculate guess distribution bar lengths when stats change
   useEffect(() => {
     function calcGuessDistributionProportions(guessDistribution) {
+      if (!guessDistribution) return;
       const max = Math.max.apply(null, Object.values(guessDistribution));
 
       const proportions = {
@@ -36,17 +51,8 @@ export default function Statistics(props) {
       });
       setGuessDistributionProportions(proportions);
     }
-    
-    const fetchStatsWrapper = async () => {
-      console.log("Fetching Stats on First Load");
-      const fetchedStats = await fetchStats();
-      calcGuessDistributionProportions(fetchedStats.guessDistribution);
-    }
-    fetchStatsWrapper();
-    if (navigator.userAgent.search("Mac OS") != -1) {
-      setIsMacOsLike(true);
-    }
-  }, []);
+    calcGuessDistributionProportions(guessDistribution);
+  }, [guessDistribution]);
 
   useEffect(() => {
 

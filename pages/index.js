@@ -17,7 +17,7 @@ import EditProfileDialog from '../components/editProfileDialog';
 import NewUserDialog from '../components/newUserDialog';
 import Leaderboard from "../components/leaderboard";
 import { signIn, signOut, useSession } from "next-auth/react"
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 
 export default function Home() {
@@ -40,26 +40,29 @@ export default function Home() {
     setIsLeaderboardOpen(!isLeaderboardOpen);
   }  
 
-  const fetchScores = async () => {
+  const fetchScores = useCallback(async () => {
     const res = await fetch(
       `/api/scores/getScores?dateString=${new Date().toString()}`
     );
     const todayScores = await res.json();
     setScores(todayScores);
-  }
+  }, []);
 
-  async function fetchStats() {
-    const res = await fetch(`/api/stats/getStats?userId=${session.user._id}`);
-    const fetchedStats = await res.json();
-    setStats(fetchedStats);
-    return fetchedStats;
-  }
+  const fetchStats = useCallback(async () => {
+    if (session) {
+      const res = await fetch(`/api/stats/getStats?userId=${session.user._id}`);
+      const fetchedStats = await res.json();
+      setStats(fetchedStats);
+      return fetchedStats;
+    }
+    return {};
+  }, [session]);
 
-  const refresh = async () => {
+  const refreshScoresAndStats = useCallback(async () => {
     console.log('Refreshing Stats and Leaderboard');
     fetchScores();
     fetchStats();
-  }
+  }, [fetchScores, fetchStats]);
 
   return (
     <div className={styles.container}>
@@ -139,7 +142,7 @@ export default function Home() {
       <main className={styles.main}>
         <p className={styles.description}>Competl</p>
         {/* <p className={styles.description}>A competitive word guessing game.</p> */}
-        <Game refreshLeaderboard={refresh} />
+        <Game refreshLeaderboard={refreshScoresAndStats} />
         {!session && <Login disableBackdropClick />}
       </main>
       <footer className={styles.footer}>
