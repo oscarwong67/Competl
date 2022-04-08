@@ -51,6 +51,23 @@ export default function Game() {
       window.document.addEventListener("click", handleMouseClick);
       window.document.addEventListener("keydown", handleKeyPress);
     }
+
+    if (guesses.length > 0) {
+      guesses.forEach((word) => {
+        for(let i = 0; i < word.length; i++) {
+          const letter = word.charAt(i);
+          const gameboard = window.document.querySelector(`.${styles.gameboard}`);
+          const nextTile = gameboard.querySelector(":not([data-letter])");
+          if (nextTile) {
+            nextTile.dataset.letter = letter.toLowerCase();
+            nextTile.textContent = letter;
+            nextTile.dataset.state = "active";
+          }
+        }
+        const activeTiles = getActiveTiles();
+        activeTiles.forEach((...params) => setTiles(...params, word));
+      });
+    }
   }, []);
 
   useEffect(() => {
@@ -60,6 +77,10 @@ export default function Game() {
   useEffect(() => {
     localStorage.setItem('guesses', JSON.stringify(guesses));
   }, [guesses])
+
+  useEffect(() => {
+    localStorage.setItem('isGameStarted', isGameStarted);
+  }, [isGameStarted])
 
   function startGame() {
     if (isGameStarted) return;
