@@ -214,20 +214,24 @@ export default function Game(props) {
     }
 
     if (index === array.length - 1) {
-      if (checkWin(guess, wordOfDay)) {
-        showAlert("Congratulations! You guessed the word");
-        setIsGuessed(true);
-        stopInteraction();
-        onGameCompletion(true);
-      } else if (numGuesses === 6) {
-        showAlert("You lost!");
-        stopInteraction();
-        onGameCompletion(false);
+      const isGameCompleted = localStorage.getItem("isGameCompleted");
+      if (!isGameCompleted) {
+        if (checkWin(guess, wordOfDay)) {
+          showAlert("Congratulations! You guessed the word");
+          setIsGuessed(true);
+          stopInteraction();
+          onGameCompletion(true);
+        } else if (numGuesses === 6) {
+          showAlert("You lost!");
+          stopInteraction();
+          onGameCompletion(false);
+        }
       }
     }
   }
 
   async function onGameCompletion(isWin) {
+    localStorage.setItem("isGameCompleted", true);
     let position = Number.MAX_SAFE_INTEGER;
     if (isWin) {
       const positionRes = await fetch("/api/scores/addScore", {
