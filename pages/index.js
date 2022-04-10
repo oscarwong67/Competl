@@ -17,7 +17,7 @@ import EditProfileDialog from '../components/editProfileDialog';
 import NewUserDialog from '../components/newUserDialog';
 import Leaderboard from "../components/leaderboard";
 import { signIn, signOut, useSession } from "next-auth/react"
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 
 export default function Home() {
@@ -25,6 +25,8 @@ export default function Home() {
   const [openProfileMenu, setOpenProfileMenu] = useState(false);
   const [openNewUserPopup, setOpenNewUserPopup] = useState(false);
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+  const [scores, setScores] = useState([]);
+  const [stats, setStats] = useState({});
 
   useEffect(() => {
     if (session && session.user && !session.user.username) {
@@ -36,7 +38,31 @@ export default function Home() {
 
   const toggleDrawer = () => {
     setIsLeaderboardOpen(!isLeaderboardOpen);
-  }
+  }  
+
+  const fetchScores = useCallback(async () => {
+    const res = await fetch(
+      `/api/scores/getScores?dateString=${new Date().toString()}`
+    );
+    const todayScores = await res.json();
+    setScores(todayScores);
+  }, []);
+
+  const fetchStats = useCallback(async () => {
+    if (session) {
+      const res = await fetch(`/api/stats/getStats?userId=${session.user._id}`);
+      const fetchedStats = await res.json();
+      setStats(fetchedStats);
+      return fetchedStats;
+    }
+    return {};
+  }, [session]);
+
+  const refreshScoresAndStats = useCallback(async () => {
+    console.log('Refreshing Stats and Leaderboard');
+    fetchScores();
+    fetchStats();
+  }, [fetchScores, fetchStats]);
 
   return (
     <div className={styles.container}>
@@ -64,6 +90,10 @@ export default function Home() {
               <Leaderboard
                 isOpen={isLeaderboardOpen}
                 toggleDrawer={toggleDrawer}
+                fetchScores={fetchScores}
+                fetchStats={fetchStats}
+                scores={scores}
+                stats={stats}
               />
               <Typography
                 variant="h6"
@@ -93,21 +123,27 @@ export default function Home() {
               sx={{ mr: 2 }}
             >
               {/* <AccountCircleIcon /> */}
-              <EditProfileDialog openCallback={setOpenProfileMenu}
+              <EditProfileDialog
+                openCallback={setOpenProfileMenu}
                 isOpen={openProfileMenu}
-                userId={session && session.user ? session.user._id : '' } 
-                currUsername={session && session.user ? session.user.username : ''}/>
+                userId={session && session.user ? session.user._id : ""}
+                currUsername={
+                  session && session.user ? session.user.username : ""
+                }
+              />
             </IconButton>
           </Toolbar>
         </AppBar>
       )}
-      <NewUserDialog newAccount={openNewUserPopup} 
-        userId={session && session.user ? session.user._id : ''}/>
+      <NewUserDialog
+        newAccount={openNewUserPopup}
+        userId={session && session.user ? session.user._id : ""}
+      />
       <main className={styles.main}>
         <p className={styles.description}>Competl</p>
         {/* <p className={styles.description}>A competitive word guessing game.</p> */}
-        <Game />
-        <Login disableBackdropClick />
+        <Game refreshLeaderboard={refreshScoresAndStats} />
+        {!session && <Login disableBackdropClick />}
       </main>
       {/* <footer className={styles.footer}>
         <a

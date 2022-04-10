@@ -9,5 +9,5 @@ export default async function handler(req, res) {
     leaderboardPosition
   );
 
-  res.status(200);
+  res.status(200).json({});
 }

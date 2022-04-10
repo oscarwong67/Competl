@@ -56,8 +56,6 @@ export default function CustomizedDialogs() {
   };
 
   if (session) {
-    // TODO: if user is signed in, but they don't have a username, make them set one now
-    console.log(session.user);
     return <></>
   }
   return <>

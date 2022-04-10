@@ -14,28 +14,90 @@ import { getFormattedTime } from "../lib/utils";
 
 const WORD_LENGTH = 5;
 
-export default function Game() {
+export default function Game(props) {
   const [timeInMs, setTimeInMs] = useState(0.0);
+  const [isGameStarted, setIsGameStarted] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('isGameStarted');
+      const initialValue = JSON.parse(saved);
+      return initialValue || false;
+    }
+    return false;
+  });
+  const [numGuesses, setNumGuesses] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('numGuesses');
+      const initialValue = JSON.parse(saved);
+      return initialValue || 0;
+    }
+    return 0;
+  });
+  const [guesses, setGuesses] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('guesses');
+      const initialValue = JSON.parse(saved);
+      return initialValue || [];
+    }
+    return [];
+  });
+  
+  let guessed = false;
   const [isGuessed, setIsGuessed] = useState(false);
-  const [isGameStarted, setIsGameStarted] = useState(false);
   const [isGameComplete, setIsGameComplete] = useState(false);
 
-  let numGuesses = 0;
   const { data: session } = useSession();
 
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {
     console.log(`Today's word is: ${getWordOfDay().solution.toUpperCase()}`);
+    if(isGameStarted) {
+      const button = window.document.querySelector("[data-start-button]");
+      button.classList.add(`${styles.hide}`);
+      window.document.addEventListener("click", handleMouseClick);
+      window.document.addEventListener("keydown", handleKeyPress);
+    }
+
+    if (guesses.length > 0) {
+      guesses.forEach((word) => {
+        for(let i = 0; i < word.length; i++) {
+          const letter = word.charAt(i);
+          const gameboard = window.document.querySelector(`.${styles.gameboard}`);
+          const nextTile = gameboard.querySelector(":not([data-letter])");
+          if (nextTile) {
+            nextTile.dataset.letter = letter.toLowerCase();
+            nextTile.textContent = letter;
+            nextTile.dataset.state = "active";
+          }
+        }
+        const activeTiles = getActiveTiles();
+        activeTiles.forEach((...params) => setTiles(...params, word));
+      });
+    }
   }, []);
 
+  useEffect(() => {
+    localStorage.setItem('numGuesses', numGuesses);
+  }, [numGuesses])
+
+  useEffect(() => {
+    localStorage.setItem('guesses', JSON.stringify(guesses));
+  }, [guesses])
+
+  useEffect(() => {
+    localStorage.setItem('isGameStarted', isGameStarted);
+  }, [isGameStarted])
+
   function startGame() {
-    if (isGameStarted) { return; }
-    setIsGameStarted(true);
+    if (isGameStarted) return;
+    console.log("Game Started");
     const button = window.document.querySelector("[data-start-button]");
     button.classList.add(`${styles.hide}`);
 
     window.document.addEventListener("click", handleMouseClick);
     window.document.addEventListener("keydown", handleKeyPress);
+
+    localStorage.setItem('isGameStarted', true);
+    setIsGameStarted(true);
   }
 
   function stopInteraction() {
@@ -125,8 +187,9 @@ export default function Game() {
       showAlert("Not in word list!");
       return;
     }
-    numGuesses++;
-    activeTiles.forEach((...params) => setTiles(...params, guess));
+    setNumGuesses(numGuesses => numGuesses + 1);
+    setGuesses(guesses => [...guesses, guess]);
+    activeTiles.forEach((...params) => setTiles(...params, guess))
   }
 
   function setTiles(tile, index, array, guess) {
@@ -168,19 +231,22 @@ export default function Game() {
   }
 
   async function onGameCompletion(isWin) {
-    const positionRes = await fetch('/api/scores/addScore', {
-      method: "POST",
-      body: JSON.stringify({
-        userId: session.user._id,
-        timeInMs,
-        numGuesses,
-        dateString: new Date().toString(),
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const position = await positionRes.json();
+    let position = Number.MAX_SAFE_INTEGER;
+    if (isWin) {
+      const positionRes = await fetch("/api/scores/addScore", {
+        method: "POST",
+        body: JSON.stringify({
+          userId: session.user._id,
+          timeInMs,
+          numGuesses,
+          dateString: new Date().toString(),
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      position = await positionRes.json();
+    }
     await fetch("/api/stats/updateStats", {
       method: "POST",
       body: JSON.stringify({
@@ -193,7 +259,7 @@ export default function Game() {
         "Content-Type": "application/json",
       },
     });
-    // TODO: cause a leaderboard refresh somehow
+    props.refreshLeaderboard();
   }
 
   function getActiveTiles() {
