@@ -65,16 +65,15 @@ export default function Game(props) {
     }
     return false;
   });
-  const [numGuesses, setNumGuesses] = useState(() => {
+  const getNumGuesses = () => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("numGuesses");
-      console.log(saved);
       const initialValue = JSON.parse(saved);
-      console.log(initialValue);
       return initialValue || 0;
     }
     return 0;
-  });
+  };
+  let numGuesses = useRef(getNumGuesses());
   const [guesses, setGuesses] = useState(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("guesses");
@@ -145,10 +144,6 @@ export default function Game(props) {
       });
     }
   }, []);
-
-  useEffect(() => {
-    localStorage.setItem("numGuesses", numGuesses);
-  }, [numGuesses]);
 
   useEffect(() => {
     localStorage.setItem("guesses", JSON.stringify(guesses));
@@ -290,7 +285,8 @@ export default function Game(props) {
       showAlert("Not in word list!");
       return;
     }
-    setNumGuesses(numGuesses => numGuesses + 1);
+    numGuesses.current += 1;
+    localStorage.setItem("numGuesses", numGuesses.current);
     console.log('time in ms', timeInMs.current);
     setGuesses(guesses => [...guesses, { word: guess, time: timeInMs.current }]);
     activeTiles.forEach((...params) => setTiles(...params, guess))
@@ -326,7 +322,7 @@ export default function Game(props) {
         onGameCompletion(true);
         setIsGameComplete(true);
         localStorage.setItem("isGameCompleted", true);
-      } else if (numGuesses === 6) {
+      } else if (numGuesses.current === 6) {
         showAlert("You lost!");
         stopInteraction();
         onGameCompletion(false);
@@ -346,14 +342,15 @@ export default function Game(props) {
     // }
     let position = Number.MAX_SAFE_INTEGER;
     if (isWin) {
-      console.log("Won with " + numGuesses + " guesses in " + timeInMs.current + "ms."); 
-      const time = timeInMs.current;
+      console.log("Won with " + numGuesses.current + " guesses in " + timeInMs.current + "ms."); 
+      const time = parseInt(timeInMs.current);
+      const guesses = parseInt(numGuesses.current);
       const positionRes = await fetch("/api/scores/addScore", {
         method: "POST",
         body: JSON.stringify({
           userId: session.user._id,
-          time,
-          numGuesses,
+          timeInMs: time,
+          numGuesses: guesses,
           dateString: new Date().toString(),
         }),
         headers: {
@@ -367,7 +364,7 @@ export default function Game(props) {
       body: JSON.stringify({
         userId: session.user._id,
         isWin,
-        numGuesses,
+        numGuesses: guesses,
         leaderboardPosition: position,
       }),
       headers: {
