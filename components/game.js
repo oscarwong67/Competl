@@ -24,13 +24,17 @@ export default function Game(props) {
   let gameAlreadyPlayedToday = false;
   if (session) {
     const { dateLastPlayedStr } = session.user;
-    gameAlreadyPlayedToday = dateLastPlayedStr && dateLastPlayedStr === new Date().toDateString();
+    // gameAlreadyPlayedToday = dateLastPlayedStr && dateLastPlayedStr === new Date().toDateString();
+    // TODO: CHANGE BACK
   }
   
   const [isGameStarted, setIsGameStarted] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('isGameStarted');
       const initialValue = JSON.parse(saved);
+      if (initialValue && !isActive) {
+        startTimer();
+      }
       return initialValue || gameAlreadyPlayedToday || false;
     }
     return false;
@@ -302,6 +306,7 @@ export default function Game(props) {
   async function onGameCompletion(isWin) {
     let position = Number.MAX_SAFE_INTEGER;
     if (isWin) {
+      console.log("Won with " + numGuesses + " guesses in " + timeInMs + "ms."); 
       const positionRes = await fetch("/api/scores/addScore", {
         method: "POST",
         body: JSON.stringify({
