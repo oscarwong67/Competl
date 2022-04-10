@@ -3,7 +3,7 @@ import { Grid, Typography, Container } from "@mui/material";
 import { useSession } from "next-auth/react";
 import styles from "../styles/Game.module.css";
 import BackspaceIcon from "@mui/icons-material/Backspace";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   getWordOfDay,
   isGuessValid,
@@ -15,14 +15,23 @@ import { getFormattedTime } from "../lib/utils";
 const WORD_LENGTH = 5;
 
 export default function Game(props) {
+  const { data: session } = useSession();
+  
   const [timeInMs, setTimeInMs] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [timeDisplayed, setDisplayTime] = useState("00:00:00");
+  
+  let gameAlreadyPlayedToday = false;
+  if (session) {
+    const { dateLastPlayedStr } = session.user;
+    gameAlreadyPlayedToday = dateLastPlayedStr && dateLastPlayedStr === new Date().toDateString();
+  }
+  
   const [isGameStarted, setIsGameStarted] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('isGameStarted');
       const initialValue = JSON.parse(saved);
-      return initialValue || false;
+      return initialValue || gameAlreadyPlayedToday || false;
     }
     return false;
   });
@@ -53,8 +62,6 @@ export default function Game(props) {
     }
   });
 
-  const { data: session } = useSession();
-
   function startTimer() {
     setIsActive(true);
   }
@@ -63,9 +70,9 @@ export default function Game(props) {
     setIsActive(false);
   }
 
-  function updateDisplay() {    
+  const updateDisplay = useCallback(() => {    
     setDisplayTime(padTime(parseInt(timeInMs / (60 * 1000) ))+":"+padTime(parseInt(timeInMs/1000 % 60))+":"+padTime(timeInMs/10 % 100));
-  }
+  }, [timeInMs]);
 
   function padTime(val) {
     var valString = val + "";
@@ -128,10 +135,10 @@ export default function Game(props) {
       clearInterval(interval);
     }
     return () => clearInterval(interval);
-  }, [isActive, timeInMs]);
+  }, [isActive, timeInMs, updateDisplay]);
 
   function startGame() {
-    if (isGameStarted) return;
+    if (isGameStarted || gameAlreadyPlayedToday) return;
     console.log("Game Started");
     const button = window.document.querySelector("[data-start-button]");
     button.classList.add(`${styles.hide}`);
@@ -141,6 +148,17 @@ export default function Game(props) {
 
     localStorage.setItem('isGameStarted', true);
     setIsGameStarted(true);
+
+    fetch('/api/user/updateDateLastPlayed', {
+      method: 'POST',
+      body: JSON.stringify({
+        userId: session.user._id,
+        dateStr: new Date().toDateString(),
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
     startTimer();
   }
@@ -261,24 +279,27 @@ export default function Game(props) {
         key.classList.add(`${styles.wrong}`);
     }
 
-    if (index === array.length - 1) {
+    if (index === array.length - 1 && !isGameComplete) {
       if (checkWin(guess, wordOfDay)) {
         showAlert("Congratulations! You guessed the word");
         setIsGuessed(true);
         stopInteraction();
         onGameCompletion(true);
         setIsGameComplete(true);
+        localStorage.setItem("isGameCompleted", true);
       } else if (numGuesses === 6) {        
         showAlert("You lost!");
         stopInteraction();
         onGameCompletion(false);
         setIsGameComplete(true);
+        localStorage.setItem("isGameCompleted", true);
       }
+    } else if (isGameComplete || gameAlreadyPlayedToday) {
+      stopInteraction();
     }
   }
 
   async function onGameCompletion(isWin) {
-    localStorage.setItem("isGameCompleted", true);
     let position = Number.MAX_SAFE_INTEGER;
     if (isWin) {
       const positionRes = await fetch("/api/scores/addScore", {
@@ -344,7 +365,12 @@ export default function Game(props) {
         </Grid>
       </Grid>
       <div data-start-button className={styles.startButtonContainer}>
-        <button className={styles.startButton} onClick={startGame}>
+        <button className={styles.startButton} onClick={() => {
+          startGame();
+          if (gameAlreadyPlayedToday) {
+            showAlert("You Already Played Today!");
+          }
+        }}>
           START
         </button>
       </div>
