@@ -50,8 +50,7 @@ export default function Game(props) {
   let gameAlreadyPlayedToday = false;
   if (session) {
     const { dateLastPlayedStr } = session.user;
-    // gameAlreadyPlayedToday = dateLastPlayedStr && dateLastPlayedStr === new Date().toDateString();
-    // TODO: CHANGE BACK
+    gameAlreadyPlayedToday = dateLastPlayedStr && dateLastPlayedStr === new Date().toDateString();
   }
 
   const [isGameStarted, setIsGameStarted] = useState(() => {
@@ -116,7 +115,7 @@ export default function Game(props) {
 
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {
-    console.log(`Today's word is: ${getWordOfDay().solution.toUpperCase()}`);
+    // console.log(`Today's word is: ${getWordOfDay().solution.toUpperCase()}`);
     if (isGameStarted) {
       const button = window.document.querySelector("[data-start-button]");
       button.classList.add(`${styles.hide}`);
