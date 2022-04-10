@@ -339,6 +339,7 @@ export default function Game(props) {
     // if (!session) {
     //   signIn();
     // }
+
     let position = Number.MAX_SAFE_INTEGER;
     if (isWin) {
       console.log("Won with " + numGuesses.current + " guesses in " + timeInMs.current + "ms."); 
@@ -357,6 +358,7 @@ export default function Game(props) {
         },
       });
       position = await positionRes.json();
+      localStorage.setItem('position', position);
     }
     await fetch("/api/stats/updateStats", {
       method: "POST",
