@@ -196,7 +196,7 @@ export default function Game(props) {
   }
 
   function stopInteraction() {
-    console.log("Interaction Stopped");
+    // console.log("Interaction Stopped");
     window.document.removeEventListener("click", handleMouseClick);
     window.document.removeEventListener("keydown", handleKeyPress);
 
