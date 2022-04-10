@@ -45,7 +45,13 @@ export default function Game(props) {
   
   let guessed = false;
   const [isGuessed, setIsGuessed] = useState(false);
-  const [isGameComplete, setIsGameComplete] = useState(false);
+  const [isGameComplete, setIsGameComplete] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem("isGameCompleted");
+      const initialValue = JSON.parse(saved);
+      return initialValue || false;
+    }
+  });
 
   const { data: session } = useSession();
 
