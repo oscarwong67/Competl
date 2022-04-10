@@ -1,5 +1,5 @@
 import TimerIcon from "@mui/icons-material/Timer";
-import { Grid, Typography, Container, Snackbar } from "@mui/material";
+import { Grid, Typography, Container } from "@mui/material";
 import { useSession } from "next-auth/react";
 import styles from "../styles/Game.module.css";
 import BackspaceIcon from "@mui/icons-material/Backspace";
@@ -43,6 +43,7 @@ export default function Game(props) {
   
   let guessed = false;
   const [isGuessed, setIsGuessed] = useState(false);
+  const [isGameComplete, setIsGameComplete] = useState(false);
 
   const { data: session } = useSession();
 
@@ -219,10 +220,12 @@ export default function Game(props) {
         setIsGuessed(true);
         stopInteraction();
         onGameCompletion(true);
-      } else if (numGuesses === 6) {
+        setIsGameComplete(true);
+      } else if (numGuesses === 6) {        
         showAlert("You lost!");
         stopInteraction();
         onGameCompletion(false);
+        setIsGameComplete(true);
       }
     }
   }
