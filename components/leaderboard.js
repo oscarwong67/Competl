@@ -44,9 +44,12 @@ export default function Leaderboard(props) {
       ModalProps={{
         keepMounted: true,
       }}
-      
     >
-      <Statistics back={props.toggleDrawer} fetchStats={props.fetchStats} stats={props.stats} />
+      <Statistics
+        back={props.toggleDrawer}
+        fetchStats={props.fetchStats}
+        stats={props.stats}
+      />
       <Divider />
       <Box>
         <WorkspacePremiumIcon />
@@ -70,7 +73,11 @@ export default function Leaderboard(props) {
           </Typography>
         </Grid>
         <Grid item xs={2}>
-          <IconButton size="large" aria-label="back" onClick={props.fetchScores}>
+          <IconButton
+            size="large"
+            aria-label="back"
+            onClick={props.fetchScores}
+          >
             <RefreshIcon />
           </IconButton>
         </Grid>
@@ -83,7 +90,7 @@ export default function Leaderboard(props) {
           color="secondary"
           size="large"
         >
-           <ToggleButton value="0" aria-label="all">
+          <ToggleButton value="0" aria-label="all">
             All
           </ToggleButton>
           <ToggleButton value="1" aria-label="one">
@@ -135,35 +142,42 @@ export default function Leaderboard(props) {
             <TableBody>
               {/* TODO: scrolling - might need to use datagrid instead, but maybe we can do it manually too */}
               {/* Also look at https://mui.com/components/tables/#sticky-header */}
-              {props.scores.filter((score) => {
-                  if(parseInt(filterGuess) === 0) {
+              {props.scores
+                .map((score, idx) => {
+                  return { ...score, originalIdx: idx };
+                })
+                .filter((score) => {
+                  if (parseInt(filterGuess) === 0) {
                     return true;
                   } else {
                     return score.numGuesses === parseInt(filterGuess);
                   }
-                }).filter((score) => {
-                  if(nameSearchQuery === ""){
+                })
+                .filter((score) => {
+                  if (nameSearchQuery === "") {
                     return true;
                   } else {
-                    let searchName = new RegExp('^' + nameSearchQuery.toLowerCase());
+                    let searchName = new RegExp(
+                      "^" + nameSearchQuery.toLowerCase()
+                    );
                     return searchName.test(score.username.toLowerCase());
                   }
-                }).map((score, idx) => (
-                <TableRow
-                  key={idx + 1}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell component="th" scope="row">
-                    {idx + 1}.
-                  </TableCell>
-                  <TableCell>{score.username}</TableCell>
-                  <TableCell align="right">{score.numGuesses}</TableCell>
-                  <TableCell align="right">
-                    {getFormattedTime(score.timeInMs)}
-                  </TableCell>
-                </TableRow>
-              ))
-              }
+                })
+                .map((score, idx) => (
+                  <TableRow
+                    key={idx + 1}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell component="th" scope="row">
+                      {score.originalIdx + 1}.
+                    </TableCell>
+                    <TableCell>{score.username}</TableCell>
+                    <TableCell align="right">{score.numGuesses}</TableCell>
+                    <TableCell align="right">
+                      {getFormattedTime(score.timeInMs)}
+                    </TableCell>
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
         </Grid>
