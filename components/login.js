@@ -58,33 +58,58 @@ export default function CustomizedDialogs() {
   if (session) {
     return <></>
   }
-  return <>
-    <div>
-      <BootstrapDialog
-        BackdropProps={{ style: { backgroundColor: "transparent" } }}
-        aria-labelledby="customized-dialog-title"
-        open={open}
-      >
-        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-          Please Sign To Start Competing
-        </BootstrapDialogTitle>
-        <DialogContent dividers>
-        <Grid container justify="center" direction="column" >
-            <div className={styles.loginbtn}>
-              <Button variant="outlined" sx={{color: "white", backgroundColor: "secondary"}} onClick={() => signIn(providers[0].id)}>  
-                <GoogleIcon fontSize="large" className={styles.loginicon} />
-                <span className="login-btn-text">Continue with {providers[0].name}</span>
-              </Button>
-            </div>
-            <div className={styles.loginbtn}>
-              <Button variant="outlined" sx={{color: "white", backgroundColor: "secondary"}} onClick={() => signIn(providers[1].id)}>  
-                <GitHubIcon fontSize="large" className={styles.loginicon} />
-                <span className="login-btn-text">Continue with {providers[1].name}</span>
-              </Button>
-            </div>
-          </Grid>
-        </DialogContent>
-      </BootstrapDialog>
-    </div>
-   </>
+  return (
+    <>
+      <div>
+        <BootstrapDialog
+          BackdropProps={{ style: { backgroundColor: "transparent" } }}
+          aria-labelledby="customized-dialog-title"
+          open={open}
+        >
+          <BootstrapDialogTitle
+            id="customized-dialog-title"
+            onClose={handleClose}
+          >
+            Please Sign To Start Competing
+          </BootstrapDialogTitle>
+          <DialogContent dividers>
+            <Grid container justify="center" direction="column">
+              <div className={styles.loginbtn}>
+                <Button
+                  variant="outlined"
+                  sx={{ color: "white", backgroundColor: "secondary" }}
+                  onClick={() =>
+                    signIn(providers[0].id, {
+                      callbackUrl: `${window.location.origin}/`,
+                    })
+                  }
+                >
+                  <GoogleIcon fontSize="large" className={styles.loginicon} />
+                  <span className="login-btn-text">
+                    Continue with {providers[0].name}
+                  </span>
+                </Button>
+              </div>
+              <div className={styles.loginbtn}>
+                <Button
+                  variant="outlined"
+                  sx={{ color: "white", backgroundColor: "secondary" }}
+                  onClick={() =>
+                    signIn(providers[1].id, {
+                      callbackUrl: `${window.location.origin}/`,
+                    })
+                  }
+                >
+                  <GitHubIcon fontSize="large" className={styles.loginicon} />
+                  <span className="login-btn-text">
+                    Continue with {providers[1].name}
+                  </span>
+                </Button>
+              </div>
+            </Grid>
+          </DialogContent>
+        </BootstrapDialog>
+      </div>
+    </>
+  );
 }

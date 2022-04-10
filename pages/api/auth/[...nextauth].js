@@ -40,6 +40,9 @@ export default NextAuth({
       session.accessToken = token.accessToken;
       session.user = token.user;
       return session;
-    }
-  }
-})
+    },
+  },
+  pages: {
+    signIn: "/login",
+  },
+});

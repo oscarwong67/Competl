@@ -1,24 +1,39 @@
 import '../styles/globals.css'
 import CssBaseline from "@mui/material/CssBaseline";
 import { createTheme, ThemeProvider } from "@mui/material";
-import { SessionProvider } from "next-auth/react"
+import { SessionProvider, useSession } from "next-auth/react"
 
-function MyApp({ Component, pageProps: { session, ...pageProps } }) {
+export default function App({
+  Component,
+  pageProps: { session, ...pageProps },
+}) {
   return (
     <SessionProvider session={session}>
-      <ThemeProvider theme={createTheme({ palette: { mode: "dark" } })}>
-        <CssBaseline />
-        <Component {...pageProps} />
-      </ThemeProvider>
-   </SessionProvider>
-    //<ThemeProvider theme={createTheme({ palette: { mode: "dark" } })}>
-    //  <CssBaseline />
-    //  <Component {...pageProps} />
-    //</ThemeProvider>
-    //<SessionProvider session={session}>
-    //  <Component {...pageProps}/>
-    //</SessionProvider>
+      {Component.auth ? (
+        <Auth>
+          <ThemeProvider theme={createTheme({ palette: { mode: "dark" } })}>
+            <CssBaseline />
+            <Component {...pageProps} />
+          </ThemeProvider>
+        </Auth>
+      ) : (
+        <ThemeProvider theme={createTheme({ palette: { mode: "dark" } })}>
+          <CssBaseline />
+          <Component {...pageProps} />
+        </ThemeProvider>
+      )}
+    </SessionProvider>
   );
 }
 
-export default MyApp
+function Auth({ children }) {
+  // if `{ required: true }` is supplied, `status` can only be "loading" or "authenticated"
+  const { status } = useSession({ required: true });
+
+  if (status === "loading") {
+    // TODO: make this slightly nicer
+    return <div>Loading...</div>;
+  }
+
+  return children;
+}

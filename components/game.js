@@ -1,6 +1,6 @@
 import TimerIcon from "@mui/icons-material/Timer";
 import { Grid, Typography, Container } from "@mui/material";
-import { useSession } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import styles from "../styles/Game.module.css";
 import BackspaceIcon from "@mui/icons-material/Backspace";
 import { useState, useEffect, useCallback, useRef } from "react";
@@ -15,7 +15,7 @@ import { getFormattedTime } from "../lib/utils";
 const WORD_LENGTH = 5;
 
 export default function Game(props) {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [startTime, setStartTime] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('startTime');
@@ -53,10 +53,10 @@ export default function Game(props) {
     // gameAlreadyPlayedToday = dateLastPlayedStr && dateLastPlayedStr === new Date().toDateString();
     // TODO: CHANGE BACK
   }
-  
+
   const [isGameStarted, setIsGameStarted] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('isGameStarted');
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("isGameStarted");
       const initialValue = JSON.parse(saved);
       if (initialValue && !isActive) {
         startTimer();
@@ -66,26 +66,28 @@ export default function Game(props) {
     return false;
   });
   const [numGuesses, setNumGuesses] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('numGuesses');
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("numGuesses");
+      console.log(saved);
       const initialValue = JSON.parse(saved);
+      console.log(initialValue);
       return initialValue || 0;
     }
     return 0;
   });
   const [guesses, setGuesses] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('guesses');
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("guesses");
       const initialValue = JSON.parse(saved);
       return initialValue || [];
     }
     return [];
   });
-  
+
   let guessed = false;
   const [isGuessed, setIsGuessed] = useState(false);
   const [isGameComplete, setIsGameComplete] = useState(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const saved = localStorage.getItem("isGameCompleted");
       const initialValue = JSON.parse(saved);
       return initialValue || false;
@@ -116,7 +118,7 @@ export default function Game(props) {
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {
     console.log(`Today's word is: ${getWordOfDay().solution.toUpperCase()}`);
-    if(isGameStarted) {
+    if (isGameStarted) {
       const button = window.document.querySelector("[data-start-button]");
       button.classList.add(`${styles.hide}`);
       window.document.addEventListener("click", handleMouseClick);
@@ -128,7 +130,9 @@ export default function Game(props) {
         const word = wordObj.word;
         for(let i = 0; i < word.length; i++) {
           const letter = word.charAt(i);
-          const gameboard = window.document.querySelector(`.${styles.gameboard}`);
+          const gameboard = window.document.querySelector(
+            `.${styles.gameboard}`
+          );
           const nextTile = gameboard.querySelector(":not([data-letter])");
           if (nextTile) {
             nextTile.dataset.letter = letter.toLowerCase();
@@ -143,16 +147,16 @@ export default function Game(props) {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('numGuesses', numGuesses);
-  }, [numGuesses])
+    localStorage.setItem("numGuesses", numGuesses);
+  }, [numGuesses]);
 
   useEffect(() => {
-    localStorage.setItem('guesses', JSON.stringify(guesses));
-  }, [guesses])
+    localStorage.setItem("guesses", JSON.stringify(guesses));
+  }, [guesses]);
 
   useEffect(() => {
-    localStorage.setItem('isGameStarted', isGameStarted);
-  }, [isGameStarted])
+    localStorage.setItem("isGameStarted", isGameStarted);
+  }, [isGameStarted]);
 
   // Timer
   useEffect(() => {
@@ -177,17 +181,17 @@ export default function Game(props) {
     window.document.addEventListener("click", handleMouseClick);
     window.document.addEventListener("keydown", handleKeyPress);
 
-    localStorage.setItem('isGameStarted', true);
+    localStorage.setItem("isGameStarted", true);
     setIsGameStarted(true);
 
-    fetch('/api/user/updateDateLastPlayed', {
-      method: 'POST',
+    fetch("/api/user/updateDateLastPlayed", {
+      method: "POST",
       body: JSON.stringify({
         userId: session.user._id,
         dateStr: new Date().toDateString(),
       }),
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
 
@@ -322,7 +326,7 @@ export default function Game(props) {
         onGameCompletion(true);
         setIsGameComplete(true);
         localStorage.setItem("isGameCompleted", true);
-      } else if (numGuesses === 6) {        
+      } else if (numGuesses === 6) {
         showAlert("You lost!");
         stopInteraction();
         onGameCompletion(false);
@@ -337,6 +341,9 @@ export default function Game(props) {
   }
 
   async function onGameCompletion(isWin) {
+    // if (!session) {
+    //   signIn();
+    // }
     let position = Number.MAX_SAFE_INTEGER;
     if (isWin) {
       console.log("Won with " + numGuesses + " guesses in " + timeInMs.current + "ms."); 
@@ -400,16 +407,21 @@ export default function Game(props) {
           <TimerIcon color="inherit" />
         </Grid>
         <Grid item xs={6} sx={{ paddingLeft: "5px" }}>
-          <Typography><span id="displayTime">{timeDisplayed}</span></Typography>
+          <Typography>
+            <span id="displayTime">{timeDisplayed}</span>
+          </Typography>
         </Grid>
       </Grid>
       <div data-start-button className={styles.startButtonContainer}>
-        <button className={styles.startButton} onClick={() => {
-          startGame();
-          if (gameAlreadyPlayedToday) {
-            showAlert("You Already Played Today!");
-          }
-        }}>
+        <button
+          className={styles.startButton}
+          onClick={() => {
+            startGame();
+            if (gameAlreadyPlayedToday) {
+              showAlert("You Already Played Today!");
+            }
+          }}
+        >
           START
         </button>
       </div>

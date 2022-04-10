@@ -142,7 +142,7 @@ export default function Home() {
       <main className={styles.main}>
         <p className={styles.description}>Competl</p>
         {/* <p className={styles.description}>A competitive word guessing game.</p> */}
-        <Game refreshLeaderboard={refreshScoresAndStats} />
+        <Game refreshLeaderboard={refreshScoresAndStats} session={session} />
         {!session && <Login disableBackdropClick />}
       </main>
       {/* <footer className={styles.footer}>
@@ -160,3 +160,5 @@ export default function Home() {
     </div>
   );
 }
+
+Home.auth = true;
