@@ -38,9 +38,7 @@ export default function Leaderboard(props) {
       ModalProps={{
         keepMounted: true,
       }}
-      PaperProps={{
-        sx: { width: "90%" },
-      }}
+      
     >
       <Statistics back={props.toggleDrawer} fetchStats={props.fetchStats} stats={props.stats} />
       <Divider />
