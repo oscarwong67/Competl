@@ -272,6 +272,7 @@ export default function Game(props) {
   }
 
   async function onGameCompletion(isWin) {
+    localStorage.setItem("isGameCompleted", true);
     let position = Number.MAX_SAFE_INTEGER;
     if (isWin) {
       const positionRes = await fetch("/api/scores/addScore", {
