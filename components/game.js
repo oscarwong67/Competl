@@ -45,7 +45,13 @@ export default function Game(props) {
   
   let guessed = false;
   const [isGuessed, setIsGuessed] = useState(false);
-  const [isGameComplete, setIsGameComplete] = useState(false);
+  const [isGameComplete, setIsGameComplete] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem("isGameCompleted");
+      const initialValue = JSON.parse(saved);
+      return initialValue || false;
+    }
+  });
 
   const { data: session } = useSession();
 
@@ -272,6 +278,7 @@ export default function Game(props) {
   }
 
   async function onGameCompletion(isWin) {
+    localStorage.setItem("isGameCompleted", true);
     let position = Number.MAX_SAFE_INTEGER;
     if (isWin) {
       const positionRes = await fetch("/api/scores/addScore", {
