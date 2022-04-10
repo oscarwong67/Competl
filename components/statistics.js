@@ -146,7 +146,7 @@ export default function Statistics(props) {
         </Grid>
         <Grid item xs={4}>
           <Typography variant="h6">
-            {props.stats.highestLeaderPosition || "-"}
+            {parseInt(props.stats.highestLeaderPosition) === Number.MAX_SAFE_INTEGER ? "-" : props.stats.highestLeaderPosition}
           </Typography>
           <Typography variant="p">Highest Leaderboard Position</Typography>
         </Grid>
