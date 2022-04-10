@@ -1,5 +1,6 @@
 import TimerIcon from "@mui/icons-material/Timer";
 import { Grid, Typography, Container, Snackbar } from "@mui/material";
+import { useSession } from "next-auth/react";
 import styles from "../styles/Game.module.css";
 import BackspaceIcon from "@mui/icons-material/Backspace";
 import { useState, useEffect } from "react";
@@ -13,7 +14,7 @@ import { getFormattedTime } from "../lib/utils";
 
 const WORD_LENGTH = 5;
 
-export default function Game() {
+export default function Game(props) {
   const [timeInMs, setTimeInMs] = useState(0.0);
   const [isGameStarted, setIsGameStarted] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -41,6 +42,9 @@ export default function Game() {
   });
   
   let guessed = false;
+  const [isGuessed, setIsGuessed] = useState(false);
+
+  const { data: session } = useSession();
 
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {
@@ -102,8 +106,7 @@ export default function Game() {
   }
 
   const handleMouseClick = (e) => {
-    console.log(e.target.parentNode);
-    if (guessed) return;
+    if (isGuessed) return;
 
     if (e.target.matches("[data-key]")) {
       pressKey(e.target.dataset.key);
@@ -121,7 +124,7 @@ export default function Game() {
       (e.target.getAttribute("d") &&
         e.target
           .getAttribute("d")
-          .matches(
+          .includes(
             "M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.11c.36.53.9.89 1.59.89h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-3 12.59L17.59 17 14 13.41 10.41 17 9 15.59 12.59 12 9 8.41 10.41 7 14 10.59 17.59 7 19 8.41 15.41 12 19 15.59z"
           ))
     ) {
@@ -131,7 +134,7 @@ export default function Game() {
   };
 
   const handleKeyPress = (e) => {
-    if (guessed) return;
+    if (isGuessed) return;
 
     if (e.key === "Enter") {
       submitWord();
@@ -213,12 +216,47 @@ export default function Game() {
     if (index === array.length - 1) {
       if (checkWin(guess, wordOfDay)) {
         showAlert("Congratulations! You guessed the word");
-        guessed = true;
+        setIsGuessed(true);
         stopInteraction();
-
-        // fetch(`/api/scores/putScore?`)
+        onGameCompletion(true);
+      } else if (numGuesses === 6) {
+        showAlert("You lost!");
+        stopInteraction();
+        onGameCompletion(false);
       }
     }
+  }
+
+  async function onGameCompletion(isWin) {
+    let position = Number.MAX_SAFE_INTEGER;
+    if (isWin) {
+      const positionRes = await fetch("/api/scores/addScore", {
+        method: "POST",
+        body: JSON.stringify({
+          userId: session.user._id,
+          timeInMs,
+          numGuesses,
+          dateString: new Date().toString(),
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      position = await positionRes.json();
+    }
+    await fetch("/api/stats/updateStats", {
+      method: "POST",
+      body: JSON.stringify({
+        userId: session.user._id,
+        isWin,
+        numGuesses,
+        leaderboardPosition: position,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    props.refreshLeaderboard();
   }
 
   function getActiveTiles() {
