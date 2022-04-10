@@ -19,16 +19,22 @@ import TableRow from "@mui/material/TableRow";
 import { getFormattedTime } from "../lib/utils";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import IconButton from "@mui/material/IconButton";
+import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 
 export default function Leaderboard(props) {
   const [nameSearchQuery, setNameSearchQuery] = useState("");
   const { fetchScores } = props;
+  const [filterGuess, setFilterGuess] = useState('0');
 
   // only runs on component mount
   useEffect(() => {
     console.log("Fetching Scores on First Load");
     fetchScores();
   }, [fetchScores]);
+
+  const handleFilterChange = (event, newFilter) => {
+    setFilterGuess(newFilter);
+  };
 
   return (
     <Drawer
@@ -62,7 +68,7 @@ export default function Leaderboard(props) {
         <Grid item xs={2} />
         <Grid item xs={8}>
           <Typography variant="h6" component="div" gutterBottom align="center">
-            Filter By # Guesses
+            Filter By # of Guesses
           </Typography>
         </Grid>
         <Grid item xs={2}>
@@ -71,38 +77,36 @@ export default function Leaderboard(props) {
           </IconButton>
         </Grid>
         {/* # Guess Buttons */}
-        <Grid container item xs={12} sm={9} spacing={1} align="center">
-          <Grid item xs={2}>
-            <Button variant="text" align="center" size="small">
-              1
-            </Button>
-          </Grid>
-          <Grid item xs={2}>
-            <Button variant="text" align="center" size="small">
-              2
-            </Button>
-          </Grid>
-          <Grid item xs={2}>
-            <Button variant="text" align="center" size="small">
-              3
-            </Button>
-          </Grid>
-          <Grid item xs={2}>
-            <Button variant="text" align="center" size="small">
-              4
-            </Button>
-          </Grid>
-          <Grid item xs={2}>
-            <Button variant="text" align="center" size="small">
-              5
-            </Button>
-          </Grid>
-          <Grid item xs={2}>
-            <Button variant="text" align="center" size="small">
-              6
-            </Button>
-          </Grid>
-        </Grid>
+        <ToggleButtonGroup
+          value={filterGuess}
+          exclusive
+          aria-label="filter guesses"
+          onChange={handleFilterChange}
+          color="secondary"
+          size="large"
+        >
+           <ToggleButton value="0" aria-label="all">
+            All
+          </ToggleButton>
+          <ToggleButton value="1" aria-label="one">
+            1
+          </ToggleButton>
+          <ToggleButton value="2" aria-label="two">
+            2
+          </ToggleButton>
+          <ToggleButton value="3" aria-label="three">
+            3
+          </ToggleButton>
+          <ToggleButton value="4" aria-label="four">
+            4
+          </ToggleButton>
+          <ToggleButton value="5" aria-label="five">
+            5
+          </ToggleButton>
+          <ToggleButton value="6" aria-label="six">
+            6
+          </ToggleButton>
+        </ToggleButtonGroup>
         <Grid item xs={11}>
           <TextField
             id="outlined-search"
@@ -133,7 +137,13 @@ export default function Leaderboard(props) {
             <TableBody>
               {/* TODO: scrolling - might need to use datagrid instead, but maybe we can do it manually too */}
               {/* Also look at https://mui.com/components/tables/#sticky-header */}
-              {props.scores.map((score, idx) => (
+              {props.scores.filter((score) => {
+                  if(parseInt(filterGuess) === 0) {
+                    return true;
+                  } else {
+                    return score.numGuesses === parseInt(filterGuess);
+                  }
+                }).map((score, idx) => (
                 <TableRow
                   key={idx + 1}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -147,7 +157,8 @@ export default function Leaderboard(props) {
                     {getFormattedTime(score.timeInMs)}
                   </TableCell>
                 </TableRow>
-              ))}
+              ))
+              }
             </TableBody>
           </Table>
         </Grid>
