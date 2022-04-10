@@ -143,6 +143,13 @@ export default function Leaderboard(props) {
                   } else {
                     return score.numGuesses === parseInt(filterGuess);
                   }
+                }).filter((score) => {
+                  if(nameSearchQuery === ""){
+                    return true;
+                  } else {
+                    let searchName = new RegExp('^' + nameSearchQuery.toLowerCase());
+                    return searchName.test(score.username.toLowerCase());
+                  }
                 }).map((score, idx) => (
                 <TableRow
                   key={idx + 1}
