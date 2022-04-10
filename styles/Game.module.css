@@ -124,9 +124,9 @@
 .startButton {
   background-color: var(--correct-green);
   border: none;
-  font-size: 3em;
+  font-size: 2.5em;
   color: snow;
-  padding: 15px;
+  padding: 14px 28px;
   border-radius: 10px;
   cursor: pointer;
   user-select: none;

@@ -15,7 +15,9 @@ import { getFormattedTime } from "../lib/utils";
 const WORD_LENGTH = 5;
 
 export default function Game(props) {
-  const [timeInMs, setTimeInMs] = useState(0.0);
+  const [timeInMs, setTimeInMs] = useState(0);
+  const [isActive, setIsActive] = useState(false);
+  const [timeDisplayed, setDisplayTime] = useState("00:00:00");
   const [isGameStarted, setIsGameStarted] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('isGameStarted');
@@ -43,9 +45,36 @@ export default function Game(props) {
   
   let guessed = false;
   const [isGuessed, setIsGuessed] = useState(false);
-  const [isGameComplete, setIsGameComplete] = useState(false);
+  const [isGameComplete, setIsGameComplete] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem("isGameCompleted");
+      const initialValue = JSON.parse(saved);
+      return initialValue || false;
+    }
+  });
 
   const { data: session } = useSession();
+
+  function startTimer() {
+    setIsActive(true);
+  }
+
+  function stopTimer() {
+    setIsActive(false);
+  }
+
+  function updateDisplay() {    
+    setDisplayTime(padTime(parseInt(timeInMs / (60 * 1000) ))+":"+padTime(parseInt(timeInMs/1000 % 60))+":"+padTime(timeInMs/10 % 100));
+  }
+
+  function padTime(val) {
+    var valString = val + "";
+    if (valString.length < 2) {
+      return "0" + valString;
+    } else {
+      return valString;
+    }
+  }
 
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {
@@ -87,6 +116,20 @@ export default function Game(props) {
     localStorage.setItem('isGameStarted', isGameStarted);
   }, [isGameStarted])
 
+  // Timer
+  useEffect(() => {
+    let interval = null;
+    if (isActive) {
+      interval = setInterval(() => {
+        setTimeInMs(timeInMs => timeInMs + 10);
+        updateDisplay();
+      }, 10);
+    } else if (!isActive && timeInMs !== 0) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [isActive, timeInMs]);
+
   function startGame() {
     if (isGameStarted) return;
     console.log("Game Started");
@@ -98,12 +141,16 @@ export default function Game(props) {
 
     localStorage.setItem('isGameStarted', true);
     setIsGameStarted(true);
+
+    startTimer();
   }
 
   function stopInteraction() {
     console.log("Interaction Stopped");
     window.document.removeEventListener("click", handleMouseClick);
     window.document.removeEventListener("keydown", handleKeyPress);
+
+    stopTimer();
   }
 
   const handleMouseClick = (e) => {
@@ -231,6 +278,7 @@ export default function Game(props) {
   }
 
   async function onGameCompletion(isWin) {
+    localStorage.setItem("isGameCompleted", true);
     let position = Number.MAX_SAFE_INTEGER;
     if (isWin) {
       const positionRes = await fetch("/api/scores/addScore", {
@@ -292,7 +340,7 @@ export default function Game(props) {
           <TimerIcon color="inherit" />
         </Grid>
         <Grid item xs={6} sx={{ paddingLeft: "5px" }}>
-          <Typography>{getFormattedTime(timeInMs)}</Typography>
+          <Typography><span id="displayTime">{timeDisplayed}</span></Typography>
         </Grid>
       </Grid>
       <div data-start-button className={styles.startButtonContainer}>
