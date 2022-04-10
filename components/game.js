@@ -3,7 +3,7 @@ import { Grid, Typography, Container } from "@mui/material";
 import { useSession } from "next-auth/react";
 import styles from "../styles/Game.module.css";
 import BackspaceIcon from "@mui/icons-material/Backspace";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   getWordOfDay,
   isGuessValid,
@@ -16,10 +16,36 @@ const WORD_LENGTH = 5;
 
 export default function Game(props) {
   const { data: session } = useSession();
-  
-  const [timeInMs, setTimeInMs] = useState(0);
+  const [startTime, setStartTime] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('startTime');
+      const initialValue = JSON.parse(saved);
+      return initialValue || Date.now();
+    }
+    return Date.now();
+  })
+
+  const getTimeInMs = () => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('startTime');
+      const startTime = JSON.parse(saved);
+      if (startTime) {
+        let currentTime = Date.now()
+        const endTime = localStorage.getItem('endTime');
+        if (endTime) {
+          currentTime = endTime
+        }
+        const initialValue = currentTime - startTime;
+        return initialValue || 0;
+      }
+    }
+    return 0;
+  };
+
+  let timeInMs = useRef(getTimeInMs());
+
   const [isActive, setIsActive] = useState(false);
-  const [timeDisplayed, setDisplayTime] = useState("00:00:00");
+  const [timeDisplayed, setDisplayTime] = useState(padTime(parseInt(timeInMs.current / (60 * 1000) ))+":"+padTime(parseInt(timeInMs.current/1000 % 60))+":"+padTime(parseInt(timeInMs.current/10 % 100)));
   
   let gameAlreadyPlayedToday = false;
   if (session) {
@@ -75,7 +101,7 @@ export default function Game(props) {
   }
 
   const updateDisplay = useCallback(() => {    
-    setDisplayTime(padTime(parseInt(timeInMs / (60 * 1000) ))+":"+padTime(parseInt(timeInMs/1000 % 60))+":"+padTime(timeInMs/10 % 100));
+    setDisplayTime(padTime(parseInt(timeInMs.current / (60 * 1000) ))+":"+padTime(parseInt(timeInMs.current/1000 % 60))+":"+padTime(parseInt(timeInMs.current/10 % 100)));
   }, [timeInMs]);
 
   function padTime(val) {
@@ -98,7 +124,8 @@ export default function Game(props) {
     }
 
     if (guesses.length > 0) {
-      guesses.forEach((word) => {
+      guesses.forEach((wordObj) => {
+        const word = wordObj.word;
         for(let i = 0; i < word.length; i++) {
           const letter = word.charAt(i);
           const gameboard = window.document.querySelector(`.${styles.gameboard}`);
@@ -132,14 +159,14 @@ export default function Game(props) {
     let interval = null;
     if (isActive) {
       interval = setInterval(() => {
-        setTimeInMs(timeInMs => timeInMs + 10);
+        timeInMs.current = (Date.now() - startTime);
         updateDisplay();
       }, 10);
     } else if (!isActive && timeInMs !== 0) {
       clearInterval(interval);
     }
     return () => clearInterval(interval);
-  }, [isActive, timeInMs, updateDisplay]);
+  }, [isActive, timeInMs.current, updateDisplay]);
 
   function startGame() {
     if (isGameStarted || gameAlreadyPlayedToday) return;
@@ -164,6 +191,9 @@ export default function Game(props) {
       },
     });
 
+    const currentTime = Date.now()
+    localStorage.setItem('startTime', currentTime);
+    setStartTime(currentTime);
     startTimer();
   }
 
@@ -257,7 +287,8 @@ export default function Game(props) {
       return;
     }
     setNumGuesses(numGuesses => numGuesses + 1);
-    setGuesses(guesses => [...guesses, guess]);
+    console.log('time in ms', timeInMs.current);
+    setGuesses(guesses => [...guesses, { word: guess, time: timeInMs.current }]);
     activeTiles.forEach((...params) => setTiles(...params, guess))
   }
 
@@ -298,6 +329,8 @@ export default function Game(props) {
         setIsGameComplete(true);
         localStorage.setItem("isGameCompleted", true);
       }
+      const currentTime = Date.now()
+      localStorage.setItem('endTime', currentTime);
     } else if (isGameComplete || gameAlreadyPlayedToday) {
       stopInteraction();
     }
@@ -306,12 +339,13 @@ export default function Game(props) {
   async function onGameCompletion(isWin) {
     let position = Number.MAX_SAFE_INTEGER;
     if (isWin) {
-      console.log("Won with " + numGuesses + " guesses in " + timeInMs + "ms."); 
+      console.log("Won with " + numGuesses + " guesses in " + timeInMs.current + "ms."); 
+      const time = timeInMs.current;
       const positionRes = await fetch("/api/scores/addScore", {
         method: "POST",
         body: JSON.stringify({
           userId: session.user._id,
-          timeInMs,
+          time,
           numGuesses,
           dateString: new Date().toString(),
         }),
