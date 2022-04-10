@@ -80,7 +80,10 @@ export default function EditProfileDialog({ userId, currUsername, openCallback, 
         }}
       >
         <MenuItem onClick={handleClickOpen}>Change Username</MenuItem>
-        <MenuItem onClick={signOut}>Logout</MenuItem>
+        <MenuItem onClick={() => {
+          localStorage.clear();
+          signOut();
+        }}>Logout</MenuItem>
       </Menu>
 
       <Dialog open={isOpen} onClose={handleClose}>
