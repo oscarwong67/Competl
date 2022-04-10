@@ -9,6 +9,11 @@ import ShareIcon from "@mui/icons-material/Share";
 import IosShareIcon from "@mui/icons-material/IosShare";
 import IconButton from "@mui/material/IconButton";
 import styles from "../styles/Statistics.module.css";
+import {
+  getWordOfDay,
+  checkLetter,
+} from "../lib/words";
+import { getFormattedTime } from "../lib/utils";
 
 export default function Statistics(props) {
   const { data: session } = useSession();
@@ -66,6 +71,62 @@ export default function Statistics(props) {
     }
   };
 
+  function share() {
+    let clipboard = "";
+  
+    let d = new Date();
+    let month = (d.getMonth() + 1).toString();
+    let day = d.getDate().toString();
+    let year = d.getFullYear();
+    if (month.length < 2) {
+      month = '0' + month;
+    }
+    if (day.length < 2) {
+      day = '0' + day;
+    }
+
+    let date = localStorage.getItem('shareDate')
+    clipboard += "Competl "+year+"-"+month+"-"+day+"\n";
+      
+    let username = session.user.username;
+    console.log("username: ",username);
+    let position = localStorage.getItem('position')
+    if (position != null)
+      clipboard += username+", Rank: "+position+"\n\n";
+    else
+      clipboard += username+", Rank: -\n\n";
+  
+    let target = getWordOfDay().solution.toUpperCase();
+    console.log("target: "+target);
+  
+    const guesses = JSON.parse(localStorage.getItem('guesses'));
+    console.log("guesses: ",guesses);
+  
+    for (const guess of guesses) {
+
+      let compareGuess = guess.word.toUpperCase();
+      let row = "";
+  
+      for (var i = 0; i < compareGuess.length; i++) {
+        let checked = checkLetter(compareGuess, target, i);
+        console.log("checked: ",checked);
+        if (checked == 2) {
+          row = row+"🟩";
+        } else if (checked == 1) {
+          row = row+"🟨";
+        } else {
+          row = row+"⬛";
+        }
+      }
+      clipboard += row + " " + getFormattedTime(guess.time) + "\n";
+    }
+  
+    const numGuesses = localStorage.getItem('numGuesses');
+  
+    navigator.clipboard.writeText(clipboard);
+
+  };
+
   const renderGuessDistribution = () => {
     if (!(props.stats.guessDistribution)) return null;
     const guessDistributionElements = [1, 2, 3, 4, 5, 6].map((num) => (
@@ -118,7 +179,7 @@ export default function Statistics(props) {
           xs={4}
           sx={{ display: "flex", justifyContent: "flex-end", paddingRight: 1 }}
         >
-          <IconButton size="large" aria-label="share">
+          <IconButton size="large" aria-label="share" onClick={share}>
             {getShareIcon()}
           </IconButton>
         </Grid>
