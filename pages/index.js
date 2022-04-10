@@ -160,8 +160,3 @@ export default function Home() {
     </div>
   );
 }
-
-// AUTHENTICATION TODO:
-// Add users to database after login
-// Add select username screen
-// Clean up login screen ui
