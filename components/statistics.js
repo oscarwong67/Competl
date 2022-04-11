@@ -14,6 +14,7 @@ import {
   checkLetter,
 } from "../lib/words";
 import { getFormattedTime } from "../lib/utils";
+import Snackbar from "@mui/material/Snackbar";
 
 export default function Statistics(props) {
   const { data: session } = useSession();
@@ -23,6 +24,7 @@ export default function Statistics(props) {
   const [isMacOsLike, setIsMacOsLike] = useState(false);
   const { fetchStats } = props;
   const { guessDistribution } = props.stats;
+  const [shareSnackbarOpen, setShareSnackbarOpen] = useState(false);
 
   // Fetch stats on first load
   useEffect(() => {    
@@ -179,20 +181,34 @@ export default function Statistics(props) {
           xs={4}
           sx={{ display: "flex", justifyContent: "flex-end", paddingRight: 1 }}
         >
-          <IconButton size="large" aria-label="share" onClick={share}>
+          <IconButton size="large" aria-label="share" onClick={() => {
+            share();
+            setShareSnackbarOpen(true);
+          }}>
             {getShareIcon()}
           </IconButton>
+          <Snackbar
+            open={shareSnackbarOpen}
+            autoHideDuration={3000}
+            onClose={() => {
+              setShareSnackbarOpen(false);
+            }}
+            message="Copied to clipboard"
+          />
         </Grid>
       </Grid>
       <Grid container spacing={2} justifyContent="space-around">
         <Grid item xs={2}>
-          <Typography variant="h6">&nbsp;{props.stats.numGamesPlayed}</Typography>
+          <Typography variant="h6">
+            &nbsp;{props.stats.numGamesPlayed}
+          </Typography>
           <Typography variant="p">&nbsp;Played</Typography>
         </Grid>
         <Grid item xs={2}>
           <Typography variant="h6">
-            {Math.floor((props.stats.numGamesWon * 100) / props.stats.numGamesPlayed) ||
-              "-"}
+            {Math.floor(
+              (props.stats.numGamesWon * 100) / props.stats.numGamesPlayed
+            ) || "-"}
             %
           </Typography>
           <Typography variant="p">Win %</Typography>
@@ -207,7 +223,10 @@ export default function Statistics(props) {
         </Grid>
         <Grid item xs={4}>
           <Typography variant="h6">
-            {parseInt(props.stats.highestLeaderPosition) === Number.MAX_SAFE_INTEGER ? "-" : props.stats.highestLeaderPosition}
+            {parseInt(props.stats.highestLeaderPosition) ===
+            Number.MAX_SAFE_INTEGER
+              ? "-"
+              : props.stats.highestLeaderPosition}
           </Typography>
           <Typography variant="p">Highest Leaderboard Position</Typography>
         </Grid>

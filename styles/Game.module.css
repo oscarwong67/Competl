@@ -111,11 +111,10 @@
 
 .startButtonContainer {
   position: absolute;
-  left: 0;
-  bottom: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
-  width: 100%;
-  height: 90vh;
   justify-content: center;
   align-items: center;
   z-index: 1;

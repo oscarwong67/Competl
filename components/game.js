@@ -14,10 +14,22 @@ import { getFormattedTime } from "../lib/utils";
 
 const WORD_LENGTH = 5;
 
+function clearLocalStorageIfNewDay() {
+  if (typeof window !== "undefined") {
+    const startTime = parseInt(localStorage.getItem("startTime"));
+    const prevDayStr = new Date(startTime).toDateString();
+    if (startTime && prevDayStr != new Date().toDateString()) {
+      console.log('Clearing Local Storage as user last played on ' + prevDayStr + ' and it\'s now' + new Date().toDateString());
+      localStorage.clear();
+    }
+  }
+}
+
 export default function Game(props) {
   const { data: session, status } = useSession();
   const [startTime, setStartTime] = useState(() => {
     if (typeof window !== 'undefined') {
+      clearLocalStorageIfNewDay();
       const saved = localStorage.getItem('startTime');
       const initialValue = JSON.parse(saved);
       return initialValue || Date.now();
@@ -27,11 +39,12 @@ export default function Game(props) {
 
   const getTimeInMs = () => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('startTime');
-      const startTime = JSON.parse(saved);
+      clearLocalStorageIfNewDay();
+      const saved = localStorage.getItem("startTime");
+      const startTime = parseInt(JSON.parse(saved));
       if (startTime) {
         let currentTime = Date.now()
-        const endTime = localStorage.getItem('endTime');
+        const endTime = parseInt(localStorage.getItem('endTime'));
         if (endTime) {
           currentTime = endTime
         }
@@ -50,22 +63,27 @@ export default function Game(props) {
   let gameAlreadyPlayedToday = false;
   if (session) {
     const { dateLastPlayedStr } = session.user;
-    gameAlreadyPlayedToday = dateLastPlayedStr && dateLastPlayedStr === new Date().toDateString();
+    gameAlreadyPlayedToday =
+      dateLastPlayedStr &&
+      dateLastPlayedStr === new Date().toDateString() &&
+      !JSON.parse(localStorage.getItem("isGameStarted"));
   }
 
   const [isGameStarted, setIsGameStarted] = useState(() => {
     if (typeof window !== "undefined") {
+      clearLocalStorageIfNewDay();
       const saved = localStorage.getItem("isGameStarted");
       const initialValue = JSON.parse(saved);
       if (initialValue && !isActive) {
         startTimer();
       }
-      return initialValue || gameAlreadyPlayedToday || false;
+      return initialValue || false;
     }
     return false;
   });
   const getNumGuesses = () => {
     if (typeof window !== "undefined") {
+      clearLocalStorageIfNewDay();
       const saved = localStorage.getItem("numGuesses");
       const initialValue = JSON.parse(saved);
       return initialValue || 0;
@@ -75,6 +93,7 @@ export default function Game(props) {
   let numGuesses = useRef(getNumGuesses());
   const [guesses, setGuesses] = useState(() => {
     if (typeof window !== "undefined") {
+      clearLocalStorageIfNewDay();
       const saved = localStorage.getItem("guesses");
       const initialValue = JSON.parse(saved);
       return initialValue || [];
@@ -86,6 +105,7 @@ export default function Game(props) {
   const [isGuessed, setIsGuessed] = useState(false);
   const [isGameComplete, setIsGameComplete] = useState(() => {
     if (typeof window !== "undefined") {
+      clearLocalStorageIfNewDay();
       const saved = localStorage.getItem("isGameCompleted");
       const initialValue = JSON.parse(saved);
       return initialValue || false;
@@ -341,16 +361,16 @@ export default function Game(props) {
     // }
 
     let position = Number.MAX_SAFE_INTEGER;
+    const guessesNum = parseInt(numGuesses.current);
     if (isWin) {
       console.log("Won with " + numGuesses.current + " guesses in " + timeInMs.current + "ms."); 
       const time = parseInt(timeInMs.current);
-      const guesses = parseInt(numGuesses.current);
       const positionRes = await fetch("/api/scores/addScore", {
         method: "POST",
         body: JSON.stringify({
           userId: session.user._id,
           timeInMs: time,
-          numGuesses: guesses,
+          numGuesses: guessesNum,
           dateString: new Date().toString(),
         }),
         headers: {
@@ -365,7 +385,7 @@ export default function Game(props) {
       body: JSON.stringify({
         userId: session.user._id,
         isWin,
-        numGuesses: guesses,
+        numGuesses: guessesNum,
         leaderboardPosition: position,
       }),
       headers: {
