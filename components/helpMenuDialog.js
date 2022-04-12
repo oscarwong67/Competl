@@ -42,7 +42,7 @@ export default function HelpMenuDialog({ isOpen, openCallback }) {
             Example
           </DialogContentText>
           <Image 
-            src='/public/help_img.png' 
+            src='/../public/help_img.png' 
             alt='Competl guess' 
             width={280} 
             height={50}
