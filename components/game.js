@@ -26,7 +26,8 @@ function clearLocalStorageIfNewDay() {
   }
 }
 
-export default function Game(props) {
+export default function Game({ refreshLeaderboard, popupOpen }) {
+  const popupOpenRef = useRef(popupOpen);  
   const { data: session, status } = useSession();
   const [startTime, setStartTime] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -252,7 +253,12 @@ export default function Game(props) {
     }
   };
 
+  useEffect(() => {
+    popupOpenRef.current = popupOpen;
+  }, [popupOpen])
+
   const handleKeyPress = (e) => {
+    if (popupOpenRef.current) return;
     if (isGuessed) return;
 
     if (e.key === "Enter") {
@@ -395,7 +401,7 @@ export default function Game(props) {
         "Content-Type": "application/json",
       },
     });
-    props.refreshLeaderboard();
+    refreshLeaderboard();
   }
 
   function getActiveTiles() {
