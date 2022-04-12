@@ -117,10 +117,10 @@ export default function Statistics(props) {
           row = row+"⬛";
         }
       }
-      clipboard += row + " " + getFormattedTime(guess.time) + "\n\n";
+      clipboard += row + " " + getFormattedTime(guess.time) + "\n";
     }
   
-    clipboard += "https://competl.vercel.app/ \n";
+    clipboard += "\nhttps://competl.vercel.app/ \n";
   
     navigator.clipboard.writeText(clipboard);
 
