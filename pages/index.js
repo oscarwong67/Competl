@@ -25,6 +25,7 @@ export default function Home() {
   const [openProfileMenu, setOpenProfileMenu] = useState(false);
   const [openNewUserPopup, setOpenNewUserPopup] = useState(false);
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+  const [isHelpMenuOpen, setIsHelpMenuOpen] = useState(false);
   const [scores, setScores] = useState([]);
   const [stats, setStats] = useState({});
 
@@ -114,7 +115,7 @@ export default function Home() {
               sx={{ mr: 2 }}
             >
               {/* <HelpOutlineIcon /> */}
-              <HelpMenuDialog />
+              <HelpMenuDialog isOpen={isHelpMenuOpen} openCallback={setIsHelpMenuOpen}/>
             </IconButton>
             <IconButton
               size="large"
@@ -142,7 +143,7 @@ export default function Home() {
       <main className={styles.main}>
         <p className={styles.description}>Competl</p>
         {/* <p className={styles.description}>A competitive word guessing game.</p> */}
-        <Game refreshLeaderboard={refreshScoresAndStats} session={session} />
+        <Game refreshLeaderboard={refreshScoresAndStats} session={session} popupOpen={ openProfileMenu || openNewUserPopup || isLeaderboardOpen || isHelpMenuOpen }/>
         {!session && <Login disableBackdropClick />}
       </main>
       {/* <footer className={styles.footer}>

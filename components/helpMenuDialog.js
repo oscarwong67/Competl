@@ -10,23 +10,20 @@ import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import styles from '../styles/Home.module.css';
 import Image from 'next/image';
 
-export default function HelpMenuDialog() {
-  const [open, setOpen] = React.useState(false);
-  const theme = useTheme();
-
+export default function HelpMenuDialog({ isOpen, openCallback }) {
   const handleClickOpen = () => {
-    setOpen(true);
+    openCallback(true);
   };
 
   const handleClose = () => {
-    setOpen(false);
+    openCallback(false);
   };
 
   return (
     <div>
       <HelpOutlineIcon className={styles.center} onClick={handleClickOpen}/>
       <Dialog
-        open={open}
+        open={isOpen}
         onClose={handleClose}
         aria-labelledby="responsive-dialog-title"
       >
