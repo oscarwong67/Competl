@@ -45,7 +45,7 @@ export default function HelpMenuDialog() {
             Example
           </DialogContentText>
           <Image 
-            src='/../public/helpimg.png' 
+            src='/../public/help_img.png' 
             alt='Competl guess' 
             width={280} 
             height={50}
