@@ -46,6 +46,9 @@ export default function EditProfileDialog({ userId, currUsername, openCallback, 
     if (checkValidUsername(usernameValue)) {
       // Call username backend function
       updateUserName(userId, usernameValue);
+      if (typeof window !== 'undefined') {
+        window.location.reload();
+      }
       handleClose(false);
     }
   }

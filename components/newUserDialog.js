@@ -33,6 +33,9 @@ export default function NewUserDialog({ newAccount, userId }) {
       console.log('set username to', usernameValue)
       // Call username backend function
       updateUserName(userId, usernameValue);
+      if (typeof window !== "undefined") {
+        window.location.reload();
+      }
       setOpen(false);
     }
   };
