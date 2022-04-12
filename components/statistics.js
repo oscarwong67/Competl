@@ -12,6 +12,7 @@ import styles from "../styles/Statistics.module.css";
 import {
   getWordOfDay,
   checkLetter,
+  checkGuess,
 } from "../lib/words";
 import { getFormattedTime } from "../lib/utils";
 import Snackbar from "@mui/material/Snackbar";
@@ -92,11 +93,7 @@ export default function Statistics(props) {
       
     let username = session.user.username;
     console.log("username: ",username);
-    let position = localStorage.getItem('position')
-    if (position != null)
-      clipboard += username+", Rank: "+position+"\n\n";
-    else
-      clipboard += username+", Rank: -\n\n";
+    clipboard += username+"\n\n";
   
     let target = getWordOfDay().solution.toUpperCase();
     console.log("target: "+target);
@@ -106,24 +103,24 @@ export default function Statistics(props) {
   
     for (const guess of guesses) {
 
-      let compareGuess = guess.word.toUpperCase();
+      console.log(guess.word);
+
       let row = "";
+      let tiles = checkGuess(guess.word, target);
   
-      for (var i = 0; i < compareGuess.length; i++) {
-        let checked = checkLetter(compareGuess, target, i);
-        console.log("checked: ",checked);
-        if (checked == 2) {
+      for (var i = 0; i < tiles.length; i++) {
+        if (tiles[i] == 2) {
           row = row+"🟩";
-        } else if (checked == 1) {
+        } else if (tiles[i] == 1) {
           row = row+"🟨";
         } else {
           row = row+"⬛";
         }
       }
-      clipboard += row + " " + getFormattedTime(guess.time) + "\n";
+      clipboard += row + " " + getFormattedTime(guess.time) + "\n\n";
     }
   
-    const numGuesses = localStorage.getItem('numGuesses');
+    clipboard += "https://competl.vercel.app/ \n";
   
     navigator.clipboard.writeText(clipboard);
 

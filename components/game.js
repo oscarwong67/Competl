@@ -9,6 +9,7 @@ import {
   isGuessValid,
   checkLetter,
   checkWin,
+  checkGuess,
 } from "../lib/words";
 import { getFormattedTime } from "../lib/utils";
 
@@ -25,8 +26,7 @@ function clearLocalStorageIfNewDay() {
   }
 }
 
-export default function Game({ refreshLeaderboard, popupOpen }) {
-  const popupOpenRef = useRef(popupOpen);  
+export default function Game(props) {
   const { data: session, status } = useSession();
   const [startTime, setStartTime] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -252,12 +252,7 @@ export default function Game({ refreshLeaderboard, popupOpen }) {
     }
   };
 
-  useEffect(() => {
-    popupOpenRef.current = popupOpen;
-  }, [popupOpen])
-
   const handleKeyPress = (e) => {
-    if (popupOpenRef.current) return;
     if (isGuessed) return;
 
     if (e.key === "Enter") {
@@ -314,7 +309,9 @@ export default function Game({ refreshLeaderboard, popupOpen }) {
     localStorage.setItem("numGuesses", numGuesses.current);
     console.log('time in ms', timeInMs.current);
     setGuesses(guesses => [...guesses, { word: guess, time: timeInMs.current }]);
-    activeTiles.forEach((...params) => setTiles(...params, guess))
+    activeTiles.forEach((...params) => setTiles(...params, guess));
+
+
   }
 
   function setTiles(tile, index, array, guess) {
@@ -323,7 +320,7 @@ export default function Game({ refreshLeaderboard, popupOpen }) {
     const letter = tile.dataset.letter.toUpperCase();
     const key = keyboard.querySelector(`[data-key="${letter}"]`);
 
-    const letterValue = checkLetter(guess, wordOfDay, index);
+    const letterValue = checkGuess(guess, wordOfDay)[index];
 
     switch (letterValue) {
       case 2:
@@ -398,7 +395,7 @@ export default function Game({ refreshLeaderboard, popupOpen }) {
         "Content-Type": "application/json",
       },
     });
-    refreshLeaderboard();
+    props.refreshLeaderboard();
   }
 
   function getActiveTiles() {
