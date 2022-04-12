@@ -351,7 +351,7 @@ export default function Game({ refreshLeaderboard, popupOpen }) {
         setIsGameComplete(true);
         localStorage.setItem("isGameCompleted", true);
       } else if (numGuesses.current === 6) {
-        showAlert(`You lost! The word was ${guess}`);
+        showAlert(`You lost! The word was ${wordOfDay}`);
         stopInteraction();
         onGameCompletion(false);
         setIsGameComplete(true);
