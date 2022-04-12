@@ -88,7 +88,7 @@ export default function EditProfileDialog({ userId, currUsername, openCallback, 
 
       <Dialog open={isOpen} onClose={handleClose}>
         <DialogTitle>Edit Profile</DialogTitle>
-        <DialogContent sx={{ width: 385 }}>
+        <DialogContent>
           <TextField
             autoFocus
             margin="dense"
@@ -99,6 +99,7 @@ export default function EditProfileDialog({ userId, currUsername, openCallback, 
             variant="standard"
             defaultValue={currUsername}
             onChange={handleTextInput}
+            inputProps={{ maxLength: 10 }}
           />
         </DialogContent>
         <DialogActions>
