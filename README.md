@@ -9,7 +9,7 @@ First, ensure you have [Node.js](https://nodejs.org/en/) and [npm](https://docs.
 
 Optionally, you can also get the global package, [pnpm](https://pnpm.io/installation), which makes node_modules smaller via hard-linking.
 
-First, install dependencies:
+First, from the project root (`Somewhere/On/Your/Computer/Competl/`) install dependencies:
 ```bash
 npm install
 # or, if you want a smaller node_modules size
